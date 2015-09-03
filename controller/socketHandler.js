@@ -10,6 +10,7 @@ module.exports = function(io,db,app){
 		var report = new reportModule(db);
 		new reportSocketCalls(report,db,socket);
 		socket.on("getPortfolio",function(data){
+			console.log("in socket handlerssssssssss")
 			user.getPortfolio({},function(portfolioInfo){
 				socket.emit("getPortfolio",portfolioInfo)
 			})

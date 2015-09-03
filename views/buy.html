@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en"> 
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Quantum Leap</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="/assets/css/jquery-ui.css">
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script>
+      var socket = io.connect();
+      $(document).ready(function(){
+        socket.emit('getCompanies','hi')
+        socket.on('getCompanies',function(data){
+          var p='';
+          for(var x=0;x < data.length ;x++){
+            p+='<option value="'+ data[x]._id +'">'+data[x].cName+'</option>'
+          } 
+          $("#portfolio").html(p);    
+        })
+        $("#buy-form").submit(function(e){
+          e.preventDefault();
+          var data = {
+            pId : $("#pId").val(),
+            rTId : $("#rTId").val(),
+            cId : $("#cId").val(),
+            quantity : $("#quantity").val(),
+            price : $("#price").val()
+          }
+          socket.emit('buySharesFromOrg',data)
+          
+        })
+        socket.on('buySharesFromOrg',function(data){
+             $("#buy-form")[0].reset();
+        })
+      })
+    </script>
+  </head>
+  <body>
+    <div class="header">
+      <div class="logoutCon">
+        <a href="/logout">
+          <button class="exit-btn exit-btn-4">Log Out</button>
+        </a>
+      </div>
+    </div>
+    <section class="container">
+      <nav class="main-nav">
+      <ul class="nav">
+        <li><a href="/dashboard" class="nav-icon" title="Home"><span class="icon-home">Home</span></a></li>
+        <li class="active"><a class="menu-item" href="/buy" title="Buy">Buy</a></li>
+        <li><a class="menu-item" href="/sale" title="Sale">Sale</a></li>
+        <li><a class="menu-item" href="/reports" title="Reports">Reports</a></li>
+      </ul>
+    </nav>
+      <div class="content">
+        <!-- <p>hi raheem</p> -->
+        <div class="main-content">
+          <div>
+            <form action="/savereportDetails" id="buy-form" method="POST">
+              <font color='white'>
+                  <center><h2>Buy</h2></center>
+                  <hr>
+                  <input type="hidden" name="pId" id="pId" value="{{portfolio}}">
+                  <input type="hidden" name="rTId" id="rTId" value="{{reportType}}">
+                  <center>
+                    <label><b>Company Name :</b></label>
+                    <select name="cId" id="cId">
+                      <option value="">--select--</option>
+                    </select>
+                  </center>
+                  <br />
+                  <center>
+                    <label><b>Quantity :</b></label>
+                    <input type="text" name="quantity" id="quantity">
+                  </center>
+                  <br />
+                  <center>
+                    <label><b>Price :</b></label>
+                    <input type="text" name="price" id="price">
+                  </center>
+                  <br />
+                  <center>
+                    <input type="submit" value="Buy" class="button" id='buy'>
+                  </center>
+                  <hr>
+              </font> 
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

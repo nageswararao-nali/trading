@@ -1,7 +1,7 @@
 
 function reportSocketCalls(report,db,socket){
 	socket.on('buySharesFromOrg',function(data){
-		console.log('in buySharesFromOrg socket call')
+		console.log('in buySharesFromOrg socket call' + JSON.stringify(data))
 		report.buySharesFromOrg(data,function(result){
 			socket.emit('buySharesFromOrg',result);
 		})
