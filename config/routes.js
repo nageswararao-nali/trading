@@ -46,15 +46,15 @@ module.exports = function(app,db){
 	app.get('/sale',function(req,res){
 		if(req.session.isUserLoggedIn){
       		var reportDetails = req.session.reportDetails;
-      		res.render("ale.html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
+      		res.render("sale.html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
 		}else{
       		res.render("adminLogin.html");
 		}
 	});
-	app.get('/report',function(req,res){
+	app.get('/reports',function(req,res){
 		if(req.session.isUserLoggedIn){
       		var reportDetails = req.session.reportDetails;
-      		res.render("report.html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
+      		res.render("reports.html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
 		}else{
       		res.render("adminLogin.html");
 		}
