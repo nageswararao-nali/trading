@@ -14,7 +14,6 @@
       $(document).ready(function(){
         socket.emit('getPortfolio','hi')
         socket.on('getPortfolio',function(data){
-          console.log(data)
           var p='<option value="">All</option>';
           for(var x=0;x < data.length ;x++){
             p+='<option value="'+ data[x]._id +'">'+data[x].pName+'</option>'
@@ -34,9 +33,21 @@
   </head>
   <body>
     <div class="header">
-      <div class="logoutCon"><a href="/logout"><button class="exit-btn exit-btn-4">Log Out</button></a></div>
+      <div class="logoutCon">
+        <a href="/logout">
+          <button class="exit-btn exit-btn-4">Log Out</button>
+        </a>
+      </div>
     </div>
     <section class="container">
+      <nav class="main-nav">
+      <ul class="nav">
+        <li><a href="/dashboard" class="nav-icon" title="Home"><span class="icon-home">Home</span></a></li>
+        <li><a class="menu-item" href="/buy" title="Buy">Buy</a></li>
+        <li><a class="menu-item" href="/sale" title="Sale">Sale</a></li>
+        <li class="active"><a class="menu-item" href="/reports" title="Reports">Reports</a></li>
+      </ul>
+    </nav>
       <nav class="side-nav">
         <a href="/admin/addNew" class="side-nav-button active" title="Add New">Add New</a>
       </nav>

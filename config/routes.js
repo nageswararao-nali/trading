@@ -25,6 +25,40 @@ module.exports = function(app,db){
 		else
 			res.render("adminLogin.html",{"status":"Invalid username/passowrd"})
 	});
+	app.post('/savereportDetails',function(req,res){
+		var portfolio = req.body.portfolio;
+		var reportType = req.body.reportType;
+		var reportDetails = {
+			portfolio : portfolio,
+			reportType : reportType
+		};
+		req.session.reportDetails = reportDetails;
+		res.redirect("/buy")
+	});
+	app.get('/buy',function(req,res){
+		if(req.session.isUserLoggedIn){
+			reportDetails = req.session.reportDetails;
+      		res.render("buy.html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
+		}else{
+      		res.render("adminLogin.html");
+		}
+	});
+	app.get('/sale',function(req,res){
+		if(req.session.isUserLoggedIn){
+      		reportDetails = req.session.reportDetails;
+      		res.render("ale.html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
+		}else{
+      		res.render("adminLogin.html");
+		}
+	});
+	app.get('/report',function(req,res){
+		if(req.session.isUserLoggedIn){
+      		reportDetails = req.session.reportDetails;
+      		res.render("report.html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
+		}else{
+      		res.render("adminLogin.html");
+		}
+	});
 	app.get('/dashboard',function(req,res){
 		if(req.session.isUserLoggedIn){
       		res.render("dashboard.html");

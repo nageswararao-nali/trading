@@ -6,6 +6,7 @@ module.exports = function(io,db,app){
 		new userSocketCalls(db,socket);
 		var user = new userModule(db)
 		socket.on("getPortfolio",function(data){
+			console.log("in socket handlerssssssssss")
 			user.getPortfolio({},function(portfolioInfo){
 				socket.emit("getPortfolio",portfolioInfo)
 			})
