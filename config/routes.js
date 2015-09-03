@@ -37,7 +37,7 @@ module.exports = function(app,db){
 	});
 	app.get('/buy',function(req,res){
 		if(req.session.isUserLoggedIn){
-			reportDetails = req.session.reportDetails;
+			var reportDetails = req.session.reportDetails;
       		res.render("buy.html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
 		}else{
       		res.render("adminLogin.html");
@@ -45,7 +45,7 @@ module.exports = function(app,db){
 	});
 	app.get('/sale',function(req,res){
 		if(req.session.isUserLoggedIn){
-      		reportDetails = req.session.reportDetails;
+      		var reportDetails = req.session.reportDetails;
       		res.render("ale.html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
 		}else{
       		res.render("adminLogin.html");
@@ -53,7 +53,7 @@ module.exports = function(app,db){
 	});
 	app.get('/report',function(req,res){
 		if(req.session.isUserLoggedIn){
-      		reportDetails = req.session.reportDetails;
+      		var reportDetails = req.session.reportDetails;
       		res.render("report.html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
 		}else{
       		res.render("adminLogin.html");

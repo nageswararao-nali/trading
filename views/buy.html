@@ -12,40 +12,28 @@
     <script>
       var socket = io.connect();
       $(document).ready(function(){
-        /*socket.emit('getPortfolio','hi')
-        socket.on('getPortfolio',function(data){
-          var p='<option value="">All</option>';
+        socket.emit('getCompanies','hi')
+        socket.on('getCompanies',function(data){
+          var p='';
           for(var x=0;x < data.length ;x++){
-            p+='<option value="'+ data[x]._id +'">'+data[x].pName+'</option>'
+            p+='<option value="'+ data[x]._id +'">'+data[x].cName+'</option>'
           } 
           $("#portfolio").html(p);    
         })
-        socket.emit('ReportType','hi')
-        socket.on('ReportType',function(data){
-          var p='';
-          for(var x=0;x < data.length ;x++){
-            p+='<option value="'+ data[x]._id +'">'+data[x].rTName+'</option>'
-          } 
-          $("#reportType").html(p);    
-        })*/
         $("#buy-form").submit(function(e){
           e.preventDefault();
           var data = {
             pId : $("#pId").val(),
             rTId : $("#rTId").val(),
-            cName : $("#cName").val(),
+            cId : $("#cId").val(),
             quantity : $("#quantity").val(),
             price : $("#price").val()
           }
-          socket.emit('ReportType','hi')
+          socket.emit('buySharesFromOrg',data)
           
         })
-        socket.on('ReportType',function(data){
-          var p='';
-          for(var x=0;x < data.length ;x++){
-            p+='<option value="'+ data[x]._id +'">'+data[x].rTName+'</option>'
-          } 
-          $("#reportType").html(p);    
+        socket.on('buySharesFromOrg',function(data){
+             $("#buy-form")[0].reset();
         })
       })
     </script>
@@ -75,11 +63,11 @@
               <font color='white'>
                   <center><h2>Buy</h2></center>
                   <hr>
-                  <input type="hidden" name="pId" value="{{portfolio}}">
-                  <input type="hidden" name="rTId" value="{{reportType}}">
+                  <input type="hidden" name="pId" id="pId" value="{{portfolio}}">
+                  <input type="hidden" name="rTId" id="rTId" value="{{reportType}}">
                   <center>
                     <label><b>Company Name :</b></label>
-                    <select name="cName" id="cName">
+                    <select name="cId" id="cId">
                       <option value="">--select--</option>
                     </select>
                   </center>
