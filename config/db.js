@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var d1 = new Date();
-// mongoose.connect('mongodb://localhost/Trading',function(err, db){
-mongoose.connect('mongodb://192.168.0.139:27017/Trading',function(err, db){
+mongoose.connect('mongodb://localhost/Trading',function(err, db){
+// mongoose.connect('mongodb://192.168.0.139:27017/Trading',function(err, db){
 //mongoose.connect('mongodb://54.254.193.61:27017/ServerModules',function(err, db){
 // mongoose.connect('mongodb://192.168.0.148:27017/ServerModules',function(err, db){
 
