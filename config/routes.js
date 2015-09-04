@@ -38,7 +38,11 @@ module.exports = function(app,db){
 	app.get('/buy',function(req,res){
 		if(req.session.isUserLoggedIn){
 			var reportDetails = req.session.reportDetails;
-      		res.render("buy.html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
+			if(reportDetails === undefined){
+				res.redirect("/dashboard")
+			}else{
+      			res.render("buy.html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
+			}
 		}else{
       		res.render("adminLogin.html");
 		}
@@ -46,7 +50,11 @@ module.exports = function(app,db){
 	app.get('/sale',function(req,res){
 		if(req.session.isUserLoggedIn){
       		var reportDetails = req.session.reportDetails;
-      		res.render("sale.html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
+      		if(reportDetails === undefined){
+				res.redirect("/dashboard")
+			}else{
+      			res.render("sale.html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
+			}
 		}else{
       		res.render("adminLogin.html");
 		}
@@ -54,7 +62,11 @@ module.exports = function(app,db){
 	app.get('/reports',function(req,res){
 		if(req.session.isUserLoggedIn){
       		var reportDetails = req.session.reportDetails;
-      		res.render("reports.html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
+      		if(reportDetails === undefined){
+				res.redirect("/dashboard")
+			}else{
+      			res.render("reports.html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
+			}
 		}else{
       		res.render("adminLogin.html");
 		}
@@ -62,6 +74,27 @@ module.exports = function(app,db){
 	app.get('/dashboard',function(req,res){
 		if(req.session.isUserLoggedIn){
       		res.render("dashboard.html");
+		}else{
+      		res.render("adminLogin.html");
+		}
+	});
+	app.get('/admin/addNewPortfolio',function(req,res){
+		if(req.session.isUserLoggedIn){
+      		res.render("addNewPortfolio.html");
+		}else{
+      		res.render("adminLogin.html");
+		}
+	});
+	app.get('/admin/addNewCompany',function(req,res){
+		if(req.session.isUserLoggedIn){
+      		res.render("addNewCompany.html");
+		}else{
+      		res.render("adminLogin.html");
+		}
+	});
+	app.get('/admin/addNewReportType',function(req,res){
+		if(req.session.isUserLoggedIn){
+      		res.render("addNewReportType.html");
 		}else{
       		res.render("adminLogin.html");
 		}

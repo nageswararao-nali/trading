@@ -20,7 +20,7 @@
           } 
           $("#cId").html(p);    
         })
-        $("#sale-form").submit(function(e){
+        $("#buy-form").submit(function(e){
           e.preventDefault();
           var data = {
             pId : $("#pId").val(),
@@ -29,10 +29,10 @@
             quantity : $("#quantity").val(),
             price : $("#price").val()
           }
-          socket.emit('sellSharesFromOrg',data)
+          socket.emit('buySharesFromOrg',data)
           
         })
-        socket.on('sellSharesFromOrg',function(data){
+        socket.on('buySharesFromOrg',function(data){
              $("#buy-form")[0].reset();
         })
       })
@@ -48,16 +48,16 @@
     </div>
     <section class="container">
       <nav class="main-nav">
-        <ul class="nav">
-          <li><a href="/dashboard" class="nav-icon" title="Home"><span class="icon-home">Home</span></a></li>
-          <li><a class="menu-item" href="/buy" title="Buy">Buy</a></li>
-          <li class="active"><a class="menu-item" href="/sale" title="Sale">Sale</a></li>
-          <li><a class="menu-item" href="/reports" title="Reports">Reports</a></li>
-        </ul>
+      <ul class="nav">
+        <li class="active"><a href="/dashboard" class="nav-icon" title="Home"><span class="icon-home">Home</span></a></li>
+        <li><a class="menu-item" href="/buy" title="Buy">Buy</a></li>
+        <li><a class="menu-item" href="/sale" title="Sale">Sale</a></li>
+        <li><a class="menu-item" href="/reports" title="Reports">Reports</a></li>
+      </ul>
       </nav>
       <nav class="side-nav">
         <a href="/admin/addNewPortfolio" class="side-nav-button " title="Add New">Add New Portfolio</a>
-        <a href="/admin/addNewCompany" class="side-nav-button " title="Add New">Add New Company</a>
+        <a href="/admin/addNewCompany" class="side-nav-button active" title="Add New">Add New Company</a>
         <a href="/admin/addNewReportType" class="side-nav-button " title="Add New">Add New Report Type</a>
       </nav>
       <div class="content">
@@ -66,10 +66,8 @@
           <div>
             <form action="/savereportDetails" id="buy-form" method="POST">
               <font color='white'>
-                  <center><h2>Sale</h2></center>
+                  <center><h2>Create New Company</h2></center>
                   <hr>
-                  <input type="hidden" name="pId" id="pId" value="{{portfolio}}">
-                  <input type="hidden" name="rTId" id="rTId" value="{{reportType}}">
                   <div class="form-group">
                     <div class="form-fields">
                       <span class="form-label">
@@ -78,38 +76,12 @@
                     </div>
                     <div class="form-fields">
                       <span  class="form-field">
-                        <select name="cId" id="cId">
-                          <option value="">--select--</option>
-                        </select>
-                      </span>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <div class="form-fields">
-                      <span class="form-label">
-                        <label><b>Quantity :</b></label>
-                      </span>
-                    </div>
-                    <div class="form-fields">
-                      <span  class="form-field">
-                        <input type="text" name="quantity" id="quantity">
-                      </span>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <div class="form-fields">
-                      <span class="form-label">
-                        <label><b>Price :</b></label>
-                      </span>
-                    </div>
-                    <div class="form-fields">
-                      <span  class="form-field">
-                        <input type="text" name="price" id="price">
+                        <input type="text" name="cName" id="cName">
                       </span>
                     </div>
                   </div>
                   <center>
-                    <input type="submit" value="Sale" class="button" id='sale'>
+                    <input type="submit" value="Create" class="button" id='Create'>
                   </center>
                   <hr>
               </font> 

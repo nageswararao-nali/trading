@@ -79,7 +79,7 @@ input {
   font-size: 14px;
 }
 
-input[type=text], input[type=password] {
+input[type=text], input[type=password], select {
   margin: 5px;
   padding: 0 10px;
   width: 200px;
@@ -456,7 +456,7 @@ td {
   font-size: 15px;
   text-transform: uppercase;
 }
-select {
+/*select {
     padding:3px;
     margin: 0;
     -webkit-border-radius:4px;
@@ -474,4 +474,22 @@ select {
     -moz-appearance:none;
     appearance:none;
     cursor:pointer;
+}*/
+.form-label{
+  float:right;
+  margin-right: 15px;
+  padding: 15px;
+}
+.form-field{
+  float:left;
+  margin-left: 15px;
+}
+.form-fields{
+  width:50%;
+  float:left;
+}
+.form-group{
+  float:left;
+  width:100%;
+  margin : 10px 0 10px 0;
 }
