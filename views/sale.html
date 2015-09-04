@@ -29,11 +29,13 @@
             quantity : $("#quantity").val(),
             price : $("#price").val()
           }
+          // alert()
           socket.emit('sellSharesFromOrg',data)
           
         })
         socket.on('sellSharesFromOrg',function(data){
-             $("#buy-form")[0].reset();
+             $("#sell-form")[0].reset();
+             alert(data.status)
         })
       })
     </script>
@@ -59,7 +61,7 @@
         <!-- <p>hi raheem</p> -->
         <div class="main-content">
           <div>
-            <form action="/savereportDetails" id="buy-form" method="POST">
+            <form action="/savereportDetails" id="sale-form" method="POST">
               <font color='white'>
                   <center><h2>Sale</h2></center>
                   <hr>

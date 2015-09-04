@@ -30,10 +30,12 @@
             price : $("#price").val()
           }
           socket.emit('buySharesFromOrg',data)
+
           
         })
         socket.on('buySharesFromOrg',function(data){
              $("#buy-form")[0].reset();
+             alert(data.status)
         })
       })
     </script>
