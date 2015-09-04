@@ -29,6 +29,14 @@ function userModule(db){
 		 	}
 		 })
 	}
+	this.getCompanies = function(callback){
+		db.Company.find().exec(function(err,list){
+			if(!err && list.length > 0)
+				callback(list);
+			else
+				callback([]);
+		})
+	}
 	
 }
 module.exports.userModule = userModule;

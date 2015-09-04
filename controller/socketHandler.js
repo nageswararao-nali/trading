@@ -15,6 +15,13 @@ module.exports = function(io,db,app){
 				socket.emit("getPortfolio",portfolioInfo)
 			})
 		})
+		socket.on("getCompanies",function(data){
+			console.log("in socket getCompanies")
+			user.getCompanies(function(list){
+				socket.emit("getCompanies",list)
+			})
+		})
+		
 		socket.on("ReportType",function(data){
 			user.getReportType({},function(reportTypeInfo){
 				socket.emit("ReportType",reportTypeInfo)
