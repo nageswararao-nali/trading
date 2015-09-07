@@ -32,6 +32,8 @@ function reportModule(db){
 						data.createDate = new Date();
 						var price = data.price;
 						data.total = parseFloat(Math.round(data.quantity * price * 100) / 100).toFixed(2);
+						console.log("savingggggggggggggggggggggg")
+						console.log(data)
 						new db.Report(data).save(function(err,doc){
 							if(!err && doc)
 								callback({'status':'success'});
@@ -139,8 +141,40 @@ function reportModule(db){
 				if(!err && reports){
 					var j=0;var reportsCon =[];
 					var n = reports.length;
-					for(var i=0;i<reports.length;i++){
-						var report = reports[i];
+					function rLoop(j){
+						var report = reports[j];
+						db.Company.findOne({cName:report.cDetails.cName},function(err,companyDetails){
+							if(!err && companyDetails){
+								var rp = {};
+								rp.cDetails = report.cDetails;
+								rp.pDetails = report.pDetails;
+								rp.quantity = report.quantity;
+								rp.price = report.price;
+								rp.total = report.total;
+								rp.total = report.total;
+								rp.cmp = companyDetails.CMP;
+								rp.pl = (companyDetails.CMP * report.quantity) - report.total;
+								reportsCon.push(rp);
+								//callback(companyDetails)
+								j++;
+								if(j>=n){
+									callback(reportsCon)
+								}else{
+									rLoop(j)
+								}
+							}else{
+								j++;
+								if(j>=n){
+									callback(reportsCon)
+								}else{
+									rLoop(j)
+								}
+								// callback({})
+							}
+						})
+					}rLoop(j)
+					// for(var i=0;i<reports.length;i++){
+						/*var report = reports[i];
 						db.Company.findOne({cName:report.cDetails.cName},function(err,companyDetails){
 							if(!err && companyDetails){
 								var rp = {};
@@ -165,8 +199,8 @@ function reportModule(db){
 								}
 								callback({})
 							}
-						})
-					}
+						})*/
+					// }
 					//callback(reports)
 				}else{
 					console.log("no reports found")
