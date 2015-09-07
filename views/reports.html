@@ -15,13 +15,15 @@
         var portfolio = $("#pId").val();
         socket.emit('getReports',{portfolio:portfolio})
         socket.on('getReports',function(data){
-          var p='<tbody>';
-          var portfolioName,reportTypeName;
-          for(var x=0;x < data.length ;x++){
-            portfolioName = data[x].pDetails.pName;
-            p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cDetails.cName +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td></tr>'
-          } 
-          p+= "</thead>";
+          if(data.length){
+            var p='<tbody>';
+            var portfolioName,reportTypeName;
+            for(var x=0;x < data.length ;x++){
+              portfolioName = data[x].pDetails.pName;
+              p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cDetails.cName +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td></tr>'
+            } 
+            p+= "</tbody>";
+          }
           $("#share-report").append(p);    
         })
       })
