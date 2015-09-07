@@ -30,6 +30,8 @@ function reportModule(db){
 					}else{
 						console.log('something here'+err);
 						data.createDate = new Date();
+						var price = data.price;
+						data.total = parseFloat(Math.round(data.quantity * price * 100) / 100).toFixed(2);
 						new db.Report(data).save(function(err,doc){
 							if(!err && doc)
 								callback({'status':'success'});
@@ -104,7 +106,7 @@ function reportModule(db){
 		})
 	}
 	function getCompanyById(cId,callback){
-		db.Company.findOne({ '_id' : cId },{'__v':0,'createDate':0}).exec(function(err,companyData){
+		db.Company.findOne({ '_id' : cId },{'__v':0,CMP:0,'createDate':0}).exec(function(err,companyData){
 			if(!err && companyData){
 				console.log('>> company data >>'+companyData);
 				callback(companyData);
@@ -134,17 +136,44 @@ function reportModule(db){
 		getPortfolioById(data.pId,function(pData){
 			var query = {"pDetails._id" : pData._id}
 			db.Report.find(query).sort({lastUpdate:-1}).exec(function(err,reports){
-				console.log(err)
-				console.log(reports)
-
 				if(!err && reports){
-					callback(reports)
+					var j=0;var reportsCon =[];
+					var n = reports.length;
+					for(var i=0;i<reports.length;i++){
+						var report = reports[i];
+						db.Company.findOne({cName:report.cDetails.cName},function(err,companyDetails){
+							if(!err && companyDetails){
+								var rp = {};
+								rp.cDetails = report.cDetails;
+								rp.pDetails = report.pDetails;
+								rp.quantity = report.quantity;
+								rp.price = report.price;
+								rp.total = report.total;
+								rp.total = report.total;
+								rp.cmp = companyDetails.CMP;
+								rp.pl = (companyDetails.CMP * report.quantity) - report.total;
+								reportsCon.push(rp);
+								//callback(companyDetails)
+								j++;
+								if(j<=n){
+									callback(reportsCon)
+								}
+							}else{
+								j++;
+								if(j<=n){
+									callback(reportsCon)
+								}
+								callback({})
+							}
+						})
+					}
+					//callback(reports)
 				}else{
+					console.log("no reports found")
 					callback({})
 				}
 			})
 		})
 	}
-	
 }
 module.exports.reportModule = reportModule;
