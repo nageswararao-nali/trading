@@ -28,5 +28,24 @@ module.exports = function(io,db,app){
 			})
 		})
 		
+		socket.on("addPortfolio",function(data){
+			user.addPortfolio(data,function(addPortfolioInfo){
+				socket.emit("addPortfolio",addPortfolioInfo)
+			})
+		})
+
+		socket.on("addCompany",function(data){
+			user.addCompany(data,function(addCompanyInfo){
+				socket.emit("addCompany",addCompanyInfo)
+			})
+		})
+
+		socket.on("addReportType",function(data){
+			user.addReportType(data,function(addCompanyInfo){
+				socket.emit("addReportType",addCompanyInfo)
+			})
+		})
+
+		
 	})
 }
