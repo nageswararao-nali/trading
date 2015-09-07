@@ -138,7 +138,7 @@ function reportModule(db){
 		getPortfolioById(data.pId,function(pData){
 			var query = {"pDetails._id" : pData._id}
 			db.Report.find(query).sort({lastUpdate:-1}).exec(function(err,reports){
-				if(!err && reports){
+				if(!err && reports.length){
 					var j=0;var reportsCon =[];
 					var n = reports.length;
 					function rLoop(j){
