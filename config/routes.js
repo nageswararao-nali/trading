@@ -99,6 +99,12 @@ module.exports = function(app,db){
       		res.render("adminLogin.html");
 		}
 	});
+	app.get('/logout',function(req,res){
+		req.session.destroy(function(err) {
+		  // cannot access session here
+		})
+  		res.render("adminLogin.html");
+	});
 	socketHandler(io,db,app);
 
 }

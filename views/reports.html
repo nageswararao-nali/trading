@@ -12,21 +12,17 @@
     <script>
       var socket = io.connect();
       $(document).ready(function(){
-        socket.emit('getPortfolio','hi')
-        socket.on('getPortfolio',function(data){
-          var p='<option value="">All</option>';
+        var portfolio = $("#pId").val();
+        socket.emit('getReports',{portfolio:portfolio})
+        socket.on('getReports',function(data){
+          var p='<tbody>';
+          var portfolioName,reportTypeName;
           for(var x=0;x < data.length ;x++){
-            p+='<option value="'+ data[x]._id +'">'+data[x].pName+'</option>'
+            portfolioName = data[x].pDetails.pName;
+            p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cDetails.cName +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td></td><td></td></tr>'
           } 
-          $("#portfolio").html(p);    
-        })
-        socket.emit('ReportType','hi')
-        socket.on('ReportType',function(data){
-          var p='';
-          for(var x=0;x < data.length ;x++){
-            p+='<option value="'+ data[x]._id +'">'+data[x].rTName+'</option>'
-          } 
-          $("#reportType").html(p);    
+          p+= "</thead>";
+          $("#share-report").append(p);    
         })
       })
     </script>
@@ -57,27 +53,22 @@
         <!-- <p>hi raheem</p> -->
         <div class="main-content">
           <div>
-            <form action="/savereportDetails" method="POST">
-              <font color='white'>
-                  <center><h2>Report Details</h2></center><hr>
-                  <center>
-                    <label><b>Select Portfolio :</b></label>
-                    <select name="portfolio" id="portfolio">
-                      <option value="">--select--</option>
-                    </select>
-                  </center>
-                  <br />
-                  <center>
-                    <label><b>Select ReportType :</b></label>
-                    <select name="reportType" id="reportType">
-                      <option value="">--select--</option>
-                    </select>
-                  </center>
-                  <br />
-                  <center><input type="submit" value="Go to Reports" class="button" id='appButton'></center>
-                  <hr>
-              </font> 
-            </form>
+            <center><h2><span>Portfolio : <span class="portfolio_name"></span></span></h2></center>
+            <hr>
+            <input type="hidden" name="pId" id="pId" value="{{portfolio}}">
+            <table id="share-report">
+              <thead>
+                <tr>
+                  <th>Sno</th>
+                  <th>Company Name</th>
+                  <th>No of Shares</th>
+                  <th>Avg Price</th>
+                  <th>Total</th>
+                  <th>CMP</th>
+                  <th>Profit/Loss</th>
+                </tr>
+              </thead>
+            </table>
           </div>
         </div>
       </div>

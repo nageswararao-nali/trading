@@ -449,6 +449,10 @@ table {
 td {
    color : white;
    font-weight: 4;
+   text-align: center;
+}
+th{
+  text-align: center;
 }
 .head{
   color : #CD853F;
@@ -493,3 +497,7 @@ td {
   width:100%;
   margin : 10px 0 10px 0;
 }
+#share-report{
+  width:100%;
+}
+

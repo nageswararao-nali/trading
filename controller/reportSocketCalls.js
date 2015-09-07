@@ -12,6 +12,11 @@ function reportSocketCalls(report,db,socket){
 			socket.emit('sellSharesFromOrg',result);
 		})
 	})
+	socket.on('getReports',function(data){
+		report.getReports({pId:data.portfolio},function(result){
+			socket.emit('getReports',result);
+		})
+	})
 
 
 	

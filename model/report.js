@@ -58,17 +58,17 @@ function reportModule(db){
 					if(!err && doc){
 						 var quantity = parseInt(doc.quantity) - parseInt(data.quantity);
 						if(quantity >= 0){
-							var price = parseInt(doc.price)+parseInt(data.price);
+							/*var price = parseInt(doc.price)+parseInt(data.price);
 							console.log('price -- 1:'+price);
 							price =parseFloat(price / 2) ;
 							console.log('price -- 2:'+price);
 							price = parseFloat(Math.round(price * 100) / 100).toFixed(2);
-							console.log('price -- 3:'+price)
-							var total = parseFloat(Math.round(quantity * price * 100) / 100).toFixed(2);
+							console.log('price -- 3:'+price)*/
+							var total = parseFloat(Math.round(quantity * doc.price * 100) / 100).toFixed(2);
 							// doc.lastUpdate = new Date();
 							console.log('quantity:'+quantity+'\ntotal:'+total)
 							console.log('------------------\n'+JSON.stringify(doc))
-							db.Report.update({ '_id':doc._id },{$set:{ 'quantity':quantity , 'price':price , 'total':total ,'lastUpdate':new Date()}},function(err,docResult){
+							db.Report.update({ '_id':doc._id },{$set:{ 'quantity':quantity ,'total':total ,'lastUpdate':new Date()}},function(err,docResult){
 								if(!err && docResult){
 									callback({'status':'update success'});
 								}
@@ -129,6 +129,21 @@ function reportModule(db){
 		  	else
 		  		console.log('unable to store data');
 		  })
+	}
+	this.getReports = function(data,callback){
+		getPortfolioById(data.pId,function(pData){
+			var query = {"pDetails._id" : pData._id}
+			db.Report.find(query).sort({lastUpdate:-1}).exec(function(err,reports){
+				console.log(err)
+				console.log(reports)
+
+				if(!err && reports){
+					callback(reports)
+				}else{
+					callback({})
+				}
+			})
+		})
 	}
 	
 }
