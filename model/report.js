@@ -18,8 +18,8 @@ function reportModule(db){
 						doc.price = parseFloat(Math.round(price * 100) / 100).toFixed(2);
 						doc.total = parseFloat(Math.round(doc.quantity * price * 100) / 100).toFixed(2);
 						doc.lastUpdate = new Date();
-						delete doc._id;
-						db.Report.update({ '_id':doc._id },function(err,docResult){
+						//delete doc._id;
+						db.Report.update({ '_id':doc._id },{quantity:doc.quantity,price:doc.price},function(err,docResult){
 							if(!err && docResult)
 								callback({'status':'update success'});
 							else{
@@ -138,7 +138,7 @@ function reportModule(db){
 		getPortfolioById(data.pId,function(pData){
 			var query = {"pDetails._id" : pData._id}
 			db.Report.find(query).sort({lastUpdate:-1}).exec(function(err,reports){
-				if(!err && reports){
+				if(!err && reports.length){
 					var j=0;var reportsCon =[];
 					var n = reports.length;
 					function rLoop(j){
