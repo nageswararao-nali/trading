@@ -19,6 +19,7 @@ exports.Portfolio = mongoose.model('Portfolio' , {
   },"Portfolio")
 exports.Company = mongoose.model('Company' , {
       "cName" : String,
+      "CMP" : Number,
       "createDate" : Date
   },"Company")
 exports.ReportType = mongoose.model('ReportType' , {
