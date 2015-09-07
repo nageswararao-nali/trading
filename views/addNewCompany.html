@@ -12,29 +12,21 @@
     <script>
       var socket = io.connect();
       $(document).ready(function(){
-        socket.emit('getCompanies','hi')
-        socket.on('getCompanies',function(data){
-          var p='';
-          for(var x=0;x < data.length ;x++){
-            p+='<option value="'+ data[x]._id +'">'+data[x].cName+'</option>'
-          } 
-          $("#cId").html(p);    
-        })
-        $("#buy-form").submit(function(e){
+
+        $("#addCompany").submit(function(e){
           e.preventDefault();
           var data = {
-            pId : $("#pId").val(),
-            rTId : $("#rTId").val(),
-            cId : $("#cId").val(),
-            quantity : $("#quantity").val(),
-            price : $("#price").val()
+            cName : $("#cName").val(),
+
           }
-          socket.emit('buySharesFromOrg',data)
-          
+          socket.emit('addCompany',data)
+          socket.on('addCompany',function(replay){
+            alert(replay.status)
+            $("#addCompany")[0].reset();
+            //$("#pName").val() = 'null';
+          })
         })
-        socket.on('buySharesFromOrg',function(data){
-             $("#buy-form")[0].reset();
-        })
+
       })
     </script>
   </head>
@@ -64,7 +56,7 @@
         <!-- <p>hi raheem</p> -->
         <div class="main-content">
           <div>
-            <form action="/savereportDetails" id="buy-form" method="POST">
+            <form action="/savereportDetails" id="addCompany" method="POST">
               <font color='white'>
                   <center><h2>Create New Company</h2></center>
                   <hr>
