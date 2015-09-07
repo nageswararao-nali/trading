@@ -152,8 +152,12 @@ function reportModule(db){
 								rp.price = report.price;
 								rp.total = report.total;
 								rp.total = report.total;
-								rp.cmp = companyDetails.CMP;
-								rp.pl = (companyDetails.CMP * report.quantity) - report.total;
+								if(companyDetails.CMP !== undefined)
+									cmp = 0;
+								else
+									cmp = companyDetails.CMP;
+								rp.cmp = cmp;
+								rp.pl = (cmp * report.quantity) - report.total;
 								reportsCon.push(rp);
 								j++;
 								if(j>=n){
