@@ -155,7 +155,6 @@ function reportModule(db){
 								rp.cmp = companyDetails.CMP;
 								rp.pl = (companyDetails.CMP * report.quantity) - report.total;
 								reportsCon.push(rp);
-								//callback(companyDetails)
 								j++;
 								if(j>=n){
 									callback(reportsCon)
@@ -169,39 +168,9 @@ function reportModule(db){
 								}else{
 									rLoop(j)
 								}
-								// callback({})
 							}
 						})
 					}rLoop(j)
-					// for(var i=0;i<reports.length;i++){
-						/*var report = reports[i];
-						db.Company.findOne({cName:report.cDetails.cName},function(err,companyDetails){
-							if(!err && companyDetails){
-								var rp = {};
-								rp.cDetails = report.cDetails;
-								rp.pDetails = report.pDetails;
-								rp.quantity = report.quantity;
-								rp.price = report.price;
-								rp.total = report.total;
-								rp.total = report.total;
-								rp.cmp = companyDetails.CMP;
-								rp.pl = (companyDetails.CMP * report.quantity) - report.total;
-								reportsCon.push(rp);
-								//callback(companyDetails)
-								j++;
-								if(j<=n){
-									callback(reportsCon)
-								}
-							}else{
-								j++;
-								if(j<=n){
-									callback(reportsCon)
-								}
-								callback({})
-							}
-						})*/
-					// }
-					//callback(reports)
 				}else{
 					console.log("no reports found")
 					callback({})
