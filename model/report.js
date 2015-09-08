@@ -20,7 +20,6 @@ function reportModule(db){
 						var lastUpdate = new Date();
 						// delete doc._id;
 						// delete doc.__v;
-						var dbs = new db.Report(doc)
 						/*dbs.save(function(err,docResult){
 							if(!err && docResult)
 								callback({'status':'update success'});
