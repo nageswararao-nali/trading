@@ -57,18 +57,16 @@ getUrl(function(dZipFilePath){
 		fs.createReadStream(dPath).pipe(unzip.Extract({ path: 'assets/ofiles/' }));
 		setTimeout(function(){
 			parseCsvFile('assets/ofiles/'+dZipFileName)
-		},2000)
-	},5000)
+		},5000)
+	},10000)
 })
 function parseCsvFile(csvFilePath){
 	// var inputFile='assets/ofiles/cm03SEP2015bhav.csv';
-	var filepath = csvFilePath.split(".");
-	filepath.pop();
-	var inputFile=filepath.join(".");
+	var inputFile=csvFilePath;
 	var companies = [];
 	var header = [];
 	var reportData = [];
-	/*db.Company.find({},{_id:0,cName:1},function(err,cNames){
+	db.Company.find({},{_id:0,cName:1},function(err,cNames){
 	    if(!err && cNames.length){
 	        for(var i=0;i<cNames.length;i++){
 	            companies.push(cNames[i].cName);
@@ -76,8 +74,7 @@ function parseCsvFile(csvFilePath){
 	        console.log(companies)
 	        fs.createReadStream(inputFile).pipe(parser);
 	    }
-	})*/
-	// fs.createReadStream(inputFile).pipe(parser);
+	})
 	var parser = parse({delimiter: ','}, function (err, data) {
 	  async.eachSeries(data, function (line, callback) {
 	    // console.log(line);
@@ -102,33 +99,32 @@ function parseCsvFile(csvFilePath){
 	            headerCallback()
 	        },function(){
 	            var i=0,isCom=0;
-	            /*if(isCom ==0){
+	            if(isCom ==0){
 	                if(companies.indexOf(line[0]) > -1)
 	                    isCom = 1;
-	            }*/
-	            // if(isCom){
-                async.eachSeries(line, function (fieldValue, headerValCallback) {
-                    if(fieldValue !== ""){
-                        dataObj[header[i]] = fieldValue;
-                    }
-                    i++;
-                    headerValCallback()
-                },function(){
-                	dataObj.lastUpdate = new Date();
-                    reportData.push(dataObj)
-                    callback();
-                })
-	            /*}else{
+	            }
+	            if(isCom){
+	                async.eachSeries(line, function (fieldValue, headerValCallback) {
+	                    if(fieldValue !== ""){
+	                        dataObj[header[i]] = fieldValue;
+	                    }
+	                    i++;
+	                    headerValCallback()
+	                },function(){
+	                    reportData.push(dataObj)
+	                    callback();
+	                })
+	            }else{
 	                callback()
-	            }*/
+	            }
 	        })
 	    	
 	    }
 	  },function(){
-	    // console.log(reportData)
-	  	// console.log("parse completed")
+	    console.log(reportData)
+	  	console.log("parse completed")
 	  	async.eachSeries(reportData, function (fieldValue, headerValCallback) {
-	        db.CompanyList.update({SYMBOL:fieldValue.SYMBOL},{$set:fieldValue},{upsert:true},function(err,upd){
+	        db.Company.update({cName:fieldValue.SYMBOL},{$set:{CMP:fieldValue.CLOSE}},function(err,upd){
 	        	headerValCallback()
 	        })
 	    },function(){
@@ -137,5 +133,5 @@ function parseCsvFile(csvFilePath){
 	  })
 		// console.log(data)
 	})
-	fs.createReadStream(inputFile).pipe(parser);
+
 }

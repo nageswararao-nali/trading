@@ -64,8 +64,6 @@ function reportModule(db){
 				})
 			})
 		})
-		
-		
 	}
 	this.sellSharesFromOrg = function(data,callback){
 		getPortfolioById(data.pId,function(pData){
@@ -112,7 +110,6 @@ function reportModule(db){
 				})
 			})
 		})
-		
 	}
 	function getPortfolioById(pId,callback){
 		db.Portfolio.findOne({ '_id' : pId },{'__v':0,'createDate':0}).exec(function(err,pData){
@@ -162,7 +159,7 @@ function reportModule(db){
 					var n = reports.length;
 					function rLoop(j){
 						var report = reports[j];
-						db.Company.findOne({cName:report.cDetails.cName},function(err,companyDetails){
+						db.CompanyList.findOne({SYMBOL:report.cDetails.cName},function(err,companyDetails){
 							if(!err && companyDetails){
 								var rp = {};
 								rp.cDetails = report.cDetails;
@@ -171,8 +168,8 @@ function reportModule(db){
 								rp.price = report.price;
 								rp.total = report.total;
 								rp.rMark = report.releaseMark;
-								if(companyDetails.CMP !== undefined)
-									cmp = companyDetails.CMP;
+								if(companyDetails.CLOSE !== undefined)
+									cmp = companyDetails.CLOSE;
 								else
 									cmp = 0;
 								rp.cmp = cmp;
@@ -208,6 +205,25 @@ function reportModule(db){
 				callback(companyDetails)
 			}else{
 				callback({})
+			}
+		})
+	}
+	this.getCompanyList = function(query,callback){
+		var companies = [];
+		db.CompanyList.find(query,{_id:0,SYMBOL:1},function(err,companiesList){
+			if(!err && companiesList){
+				var i=0,n=companiesList.length;
+				function cLoop(i){
+					companies.push(companiesList[i].SYMBOL);
+					i++;
+					if(i>=n)
+						callback(companies)
+					else
+						cLoop(i);
+						
+				}cLoop(i)
+			}else{
+				callback([])
 			}
 		})
 	}

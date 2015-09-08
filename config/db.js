@@ -19,9 +19,25 @@ exports.Portfolio = mongoose.model('Portfolio' , {
   },"Portfolio")
 exports.Company = mongoose.model('Company' , {
       "cName" : String,
-      "CMP" : Number,
       "createDate" : Date
   },"Company")
+exports.CompanyList = mongoose.model('CompanyList' , { 
+    'SYMBOL': String,
+    'SERIES': String,
+    'OPEN': Number,
+    'HIGH': Number,
+    'LOW': Number,
+    'CLOSE': Number,
+    'LAST': Number,
+    'PREVCLOSE': Number,
+    'TOTTRDQTY': Number,
+    'TOTTRDVAL': Number,
+    'TIMESTAMP': String,
+    'TOTALTRADES': Number,
+    'ISIN': String,
+    'lastUpdate': Date 
+  } ,"CompanyList")
+
 exports.ReportType = mongoose.model('ReportType' , {
       "rTName" : String,
       "createDate" : Date

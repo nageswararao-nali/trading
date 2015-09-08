@@ -12,12 +12,10 @@
     <script>
       var socket = io.connect();
       $(document).ready(function(){
-
         $("#addCompany").submit(function(e){
           e.preventDefault();
           var data = {
             cName : $("#cName").val(),
-
           }
           socket.emit('addCompany',data)
           socket.on('addCompany',function(replay){
@@ -26,7 +24,13 @@
             //$("#pName").val() = 'null';
           })
         })
-
+        socket.emit('getCompanyList',"companylist")
+        socket.on('getCompanyList',function(companies){
+          var companylist = companies;
+          $( "#cName" ).autocomplete({
+            source: companylist
+          });
+        })
       })
     </script>
   </head>

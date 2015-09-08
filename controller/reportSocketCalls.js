@@ -22,6 +22,12 @@ function reportSocketCalls(report,db,socket){
 			socket.emit('getCmp',result);
 		})
 	})
+	socket.on('getCompanyList',function(data){
+		report.getCompanyList({},function(result){
+			socket.emit('getCompanyList',result);
+		})
+	})
+	
 	
 
 
