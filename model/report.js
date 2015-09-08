@@ -13,13 +13,32 @@ function reportModule(db){
 				storeInRHistory(data,'buy');
 				db.Report.findOne({ 'pDetails._id': data.pDetails._id, 'cDetails._id': data.cDetails._id },function(err,doc){
 					if(!err && doc){
-						doc.quantity = doc.quantity + data.quantity;
-						var price = ((doc.price + data.price)/2);
-						doc.price = parseFloat(Math.round(price * 100) / 100).toFixed(2);
-						doc.total = parseFloat(Math.round(doc.quantity * price * 100) / 100).toFixed(2);
-						doc.lastUpdate = new Date();
-						delete doc._id;
-						db.Report.update({ '_id':doc._id },function(err,docResult){
+						var quantity = parseInt(doc.quantity) + parseInt(data.quantity);
+						var price = ((parseInt(doc.price) + parseInt(data.price))/2);
+						price = parseFloat(Math.round(price * 100) / 100).toFixed(2);
+						var total = parseFloat(Math.round(quantity * price * 100) / 100).toFixed(2);
+						var lastUpdate = new Date();
+						// delete doc._id;
+						// delete doc.__v;
+						var dbs = new db.Report(doc)
+						/*dbs.save(function(err,docResult){
+							if(!err && docResult)
+								callback({'status':'update success'});
+							else{
+								console.log('error:'+err);
+								callback({'status':'update fail'})
+							}
+						});*/
+						/*db.Report.update({ 'pDetails._id': data.pDetails._id, 'cDetails._id': data.cDetails._id },doc,function(err,docResult){
+							if(!err && docResult)
+								callback({'status':'update success'});
+							else{
+								console.log('error:'+err);
+								callback({'status':'update fail'})
+							}
+						})*/
+						
+						db.Report.update({ 'pDetails._id': data.pDetails._id, 'cDetails._id': data.cDetails._id },{$set:{quantity:quantity,price:price,total:total,lastUpdate:lastUpdate}},function(err,docResult){
 							if(!err && docResult)
 								callback({'status':'update success'});
 							else{
@@ -30,9 +49,9 @@ function reportModule(db){
 					}else{
 						console.log('something here'+err);
 						data.createDate = new Date();
+						data.releaseMark = 0;
 						var price = data.price;
 						data.total = parseFloat(Math.round(data.quantity * price * 100) / 100).toFixed(2);
-						console.log("savingggggggggggggggggggggg")
 						console.log(data)
 						new db.Report(data).save(function(err,doc){
 							if(!err && doc)
@@ -60,7 +79,7 @@ function reportModule(db){
 				storeInRHistory(data,'sell');
 				db.Report.findOne({ 'pDetails._id': data.pDetails._id, 'cDetails._id': data.cDetails._id },function(err,doc){
 					if(!err && doc){
-						 var quantity = parseInt(doc.quantity) - parseInt(data.quantity);
+					 	var quantity = parseInt(doc.quantity) - parseInt(data.quantity);
 						if(quantity >= 0){
 							/*var price = parseInt(doc.price)+parseInt(data.price);
 							console.log('price -- 1:'+price);
@@ -72,7 +91,8 @@ function reportModule(db){
 							// doc.lastUpdate = new Date();
 							console.log('quantity:'+quantity+'\ntotal:'+total)
 							console.log('------------------\n'+JSON.stringify(doc))
-							db.Report.update({ '_id':doc._id },{$set:{ 'quantity':quantity ,'total':total ,'lastUpdate':new Date()}},function(err,docResult){
+							var releaseMark = doc.releaseMark + ((data.quantity * data.price) - (data.quantity * doc.price))
+							db.Report.update({ '_id':doc._id },{$set:{ 'quantity':quantity ,'total':total ,releaseMark:releaseMark ,'lastUpdate':new Date()}},function(err,docResult){
 								if(!err && docResult){
 									callback({'status':'update success'});
 								}
@@ -151,12 +171,13 @@ function reportModule(db){
 								rp.quantity = report.quantity;
 								rp.price = report.price;
 								rp.total = report.total;
-								rp.total = report.total;
+								rp.rMark = report.releaseMark;
 								if(companyDetails.CMP !== undefined)
-									cmp = 0;
-								else
 									cmp = companyDetails.CMP;
+								else
+									cmp = 0;
 								rp.cmp = cmp;
+								console.log(cmp + " --- " + report.quantity + " --- " + report.total)
 								rp.pl = (cmp * report.quantity) - report.total;
 								reportsCon.push(rp);
 								j++;
@@ -180,6 +201,15 @@ function reportModule(db){
 					callback({})
 				}
 			})
+		})
+	}
+	this.getCmp = function(query,callback){
+		db.Company.findOne(query,{_id:0,CMP:1},function(err,companyDetails){
+			if(!err && companyDetails){
+				callback(companyDetails)
+			}else{
+				callback({})
+			}
 		})
 	}
 }

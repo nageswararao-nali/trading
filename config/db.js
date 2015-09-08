@@ -32,6 +32,7 @@ exports.Report = mongoose.model('Report' , {
       "quantity" : Number,
       "price" : Number,
       "total" : Number,
+      "releaseMark" : Number,
       "createDate" : Date,
       "lastUpdate" : Date
   },"Report")

@@ -20,11 +20,12 @@
             var portfolioName,reportTypeName;
             for(var x=0;x < data.length ;x++){
               portfolioName = data[x].pDetails.pName;
-              p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cDetails.cName +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td></tr>'
+              p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cDetails.cName +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td><td>'+data[x].rMark+'</td></tr>'
             } 
             p+= "</tbody>";
           }
-          $("#share-report").append(p);    
+          $("#share-report").append(p);  
+          $(".portfolio_name").html(portfolioName)  
         })
       })
     </script>
@@ -67,7 +68,8 @@
                   <th>Avg Price</th>
                   <th>Total</th>
                   <th>CMP</th>
-                  <th>Profit/Loss</th>
+                  <th>M-M Profit/Loss</th>
+                  <th>Release Mark</th>
                 </tr>
               </thead>
             </table>

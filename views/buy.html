@@ -14,7 +14,7 @@
       $(document).ready(function(){
         socket.emit('getCompanies','hi')
         socket.on('getCompanies',function(data){
-          var p='';
+          var p='<option value="">Select</option>';
           for(var x=0;x < data.length ;x++){
             p+='<option value="'+ data[x]._id +'">'+data[x].cName+'</option>'
           } 
