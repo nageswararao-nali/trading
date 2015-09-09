@@ -59,13 +59,14 @@ module.exports = function(app,db){
       		res.render("adminLogin.html");
 		}
 	});
-	app.get('/reports',function(req,res){
+	app.get('/reports/:reportType',function(req,res){
 		if(req.session.isUserLoggedIn){
       		var reportDetails = req.session.reportDetails;
       		if(reportDetails === undefined){
 				res.redirect("/dashboard")
 			}else{
-      			res.render("reports.html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
+				var reportPage = req.param("reportType");
+      			res.render(reportPage+".html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
 			}
 		}else{
       		res.render("adminLogin.html");

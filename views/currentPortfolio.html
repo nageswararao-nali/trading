@@ -20,7 +20,9 @@
             var portfolioName,reportTypeName;
             for(var x=0;x < data.length ;x++){
               portfolioName = data[x].pDetails.pName;
-              p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cDetails.cName +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td><td>'+data[x].rMark+'</td></tr>'
+              if(data[x].quantity > 0){
+                p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cDetails.cName +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td><td>'+data[x].rMark+'</td></tr>'
+              }
             } 
             p+= "</tbody>";
           }
@@ -44,13 +46,12 @@
         <li><a href="/dashboard" class="nav-icon" title="Home"><span class="icon-home">Home</span></a></li>
         <li><a class="menu-item" href="/buy" title="Buy">Buy</a></li>
         <li><a class="menu-item" href="/sale" title="Sale">Sale</a></li>
-        <li class="active"><a class="menu-item" href="/reports" title="Reports">Reports</a></li>
+        <li class="active"><a class="menu-item" href="/reports/currentPortfolio" title="Reports">Reports</a></li>
       </ul>
     </nav>
       <nav class="side-nav">
-        <a href="/admin/addNewPortfolio" class="side-nav-button " title="Add New">Add New Portfolio</a>
-        <a href="/admin/addNewCompany" class="side-nav-button " title="Add New">Add New Company</a>
-        <a href="/admin/addNewReportType" class="side-nav-button " title="Add New">Add New Report Type</a>
+        <a href="/reports/" class="side-nav-button active" title="Add New">Current Portfolio</a>
+        <a href="/reports/closedPositions" class="side-nav-button " title="Add New">Closed Positions</a>
       </nav>
       <div class="content">
         <!-- <p>hi raheem</p> -->

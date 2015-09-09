@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en"> 
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Quantum Leap</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="/assets/css/jquery-ui.css">
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script>
+      var socket = io.connect();
+      $(document).ready(function(){
+        var portfolio = $("#pId").val();
+        socket.emit('getReports',{portfolio:portfolio})
+        socket.on('getReports',function(data){
+          if(data.length){
+            var p='<tbody>';
+            var portfolioName,reportTypeName;
+            for(var x=0;x < data.length ;x++){
+              portfolioName = data[x].pDetails.pName;
+              if(data[x].quantity == 0){
+                p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cDetails.cName +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td><td>'+data[x].rMark+'</td></tr>'
+              }
+            } 
+            p+= "</tbody>";
+          }
+          $("#share-report").append(p);  
+          $(".portfolio_name").html(portfolioName)  
+        })
+      })
+    </script>
+  </head>
+  <body>
+    <div class="header">
+      <div class="logoutCon">
+        <a href="/logout">
+          <button class="exit-btn exit-btn-4">Log Out</button>
+        </a>
+      </div>
+    </div>
+    <section class="container">
+      <nav class="main-nav">
+      <ul class="nav">
+        <li><a href="/dashboard" class="nav-icon" title="Home"><span class="icon-home">Home</span></a></li>
+        <li><a class="menu-item" href="/buy" title="Buy">Buy</a></li>
+        <li><a class="menu-item" href="/sale" title="Sale">Sale</a></li>
+        <li class="active"><a class="menu-item" href="/reports/currentPortfolio" title="Reports">Reports</a></li>
+      </ul>
+    </nav>
+      <nav class="side-nav">
+        <a href="/reports/" class="side-nav-button " title="Add New">Current Portfolio</a>
+        <a href="/reports/closedPositions" class="side-nav-button active" title="Add New">Closed Positions</a>
+      </nav>
+      <div class="content">
+        <!-- <p>hi raheem</p> -->
+        <div class="main-content">
+          <div>
+            <center><h2><span>Portfolio : <span class="portfolio_name"></span></span></h2></center>
+            <hr>
+            <input type="hidden" name="pId" id="pId" value="{{portfolio}}">
+            <table id="share-report">
+              <thead>
+                <tr>
+                  <th>Sno</th>
+                  <th>Company Name</th>
+                  <th>No of Shares</th>
+                  <th>Avg Price</th>
+                  <th>Total</th>
+                  <th>CMP</th>
+                  <th>M-M Profit/Loss</th>
+                  <th>Release Mark</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
