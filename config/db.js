@@ -43,8 +43,8 @@ exports.ReportType = mongoose.model('ReportType' , {
       "createDate" : Date
   },"ReportType")
 exports.Report = mongoose.model('Report' , {
-      "pDetails" : Object,
-      "cDetails" : Object,
+      "pName" : Object,
+      "cName" : Object,
       "quantity" : Number,
       "price" : Number,
       "total" : Number,
