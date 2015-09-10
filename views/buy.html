@@ -20,12 +20,21 @@
           } 
           $("#cId").html(p);    
         })
+        var rTId = $("#rTId").val();
+        var pId = $("#pId").val();
+        socket.emit('getCompanyList',{rTId:rTId,pId:pId,type:"all"})
+        socket.on('getCompanyList',function(companies){
+          var companylist = companies;
+          $( "#cName" ).autocomplete({
+            source: companylist
+          });
+        })
         $("#buy-form").submit(function(e){
           e.preventDefault();
           var data = {
             pId : $("#pId").val(),
             rTId : $("#rTId").val(),
-            cId : $("#cId").val(),
+            cName : $("#cName").val(),
             quantity : $("#quantity").val(),
             price : $("#price").val()
           }
@@ -59,7 +68,7 @@
       </nav>
       <nav class="side-nav">
         <a href="/admin/addNewPortfolio" class="side-nav-button " title="Add New">Add New Portfolio</a>
-        <a href="/admin/addNewCompany" class="side-nav-button " title="Add New">Add New Company</a>
+        <!-- <a href="/admin/addNewCompany" class="side-nav-button " title="Add New">Add New Company</a> -->
         <a href="/admin/addNewReportType" class="side-nav-button " title="Add New">Add New Report Type</a>
       </nav>
       <div class="content">
@@ -80,9 +89,10 @@
                     </div>
                     <div class="form-fields">
                       <span  class="form-field">
-                        <select name="cId" id="cId">
+                        <!-- <select name="cId" id="cId">
                           <option value="">--select--</option>
-                        </select>
+                        </select> -->
+                        <input type="text" name="cName" id="cName">
                       </span>
                     </div>
                   </div>

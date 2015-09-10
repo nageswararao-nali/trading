@@ -23,7 +23,7 @@ function reportSocketCalls(report,db,socket){
 		})
 	})
 	socket.on('getCompanyList',function(data){
-		report.getCompanyList({},function(result){
+		report.getCompanyList(data,function(result){
 			socket.emit('getCompanyList',result);
 		})
 	})

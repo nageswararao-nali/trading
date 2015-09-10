@@ -1,10 +1,11 @@
+
 function reportModule(db){
 	// var common = new commonActions(db);
 	this.buySharesFromOrg = function(data,callback){
 		// console.log(JSON.stringify(data))
 		// {"pId":"","rTId":"55e7d548bf3390c511fbeaf8","cId":"55e810a7c49b68c812b7f780","quantity":"100","price":"15"}
 		getPortfolioById(data.pId,function(pData){
-			getCompanyById(data.cId,function(cData){
+			getCompanyById(data.cName,function(cData){
 				data.pDetails = pData;
 				data.cDetails = cData;
 				delete data.pId;
@@ -18,25 +19,6 @@ function reportModule(db){
 						price = parseFloat(Math.round(price * 100) / 100).toFixed(2);
 						var total = parseFloat(Math.round(quantity * price * 100) / 100).toFixed(2);
 						var lastUpdate = new Date();
-						// delete doc._id;
-						// delete doc.__v;
-						/*dbs.save(function(err,docResult){
-							if(!err && docResult)
-								callback({'status':'update success'});
-							else{
-								console.log('error:'+err);
-								callback({'status':'update fail'})
-							}
-						});*/
-						/*db.Report.update({ 'pDetails._id': data.pDetails._id, 'cDetails._id': data.cDetails._id },doc,function(err,docResult){
-							if(!err && docResult)
-								callback({'status':'update success'});
-							else{
-								console.log('error:'+err);
-								callback({'status':'update fail'})
-							}
-						})*/
-						
 						db.Report.update({ 'pDetails._id': data.pDetails._id, 'cDetails._id': data.cDetails._id },{$set:{quantity:quantity,price:price,total:total,lastUpdate:lastUpdate}},function(err,docResult){
 							if(!err && docResult)
 								callback({'status':'update success'});
@@ -46,7 +28,6 @@ function reportModule(db){
 							}
 						})
 					}else{
-						console.log('something here'+err);
 						data.createDate = new Date();
 						data.releaseMark = 0;
 						var price = data.price;
@@ -115,7 +96,10 @@ function reportModule(db){
 		db.Portfolio.findOne({ '_id' : pId },{'__v':0,'createDate':0}).exec(function(err,pData){
 			if(!err && pData){
 				console.log('>> Portfolio data >>'+pData);
-				callback(pData);
+				var pDataNew = {};
+				pDataNew.pId = pId;
+				pDataNew.pName = pData.pName;
+				callback(pDataNew);
 			}
 			else{
 				console.log('error while getting companyData:'+err);
@@ -123,11 +107,14 @@ function reportModule(db){
 			}
 		})
 	}
-	function getCompanyById(cId,callback){
-		db.Company.findOne({ '_id' : cId },{'__v':0,CMP:0,'createDate':0}).exec(function(err,companyData){
+	function getCompanyById(cName,callback){
+		db.CompanyList.findOne({ 'SYMBOL' : cName }).exec(function(err,companyData){
 			if(!err && companyData){
-				console.log('>> company data >>'+companyData);
-				callback(companyData);
+				var cDataNew = {};
+				cDataNew.cId = companyData._id;
+				cDataNew.cName = companyData.cName;
+				console.log('>> company data >>'+cDataNew);
+				callback(cDataNew);
 			}
 			else{
 				console.log('error while getting companyData:'+err);
@@ -208,24 +195,44 @@ function reportModule(db){
 			}
 		})
 	}
-	this.getCompanyList = function(query,callback){
+	this.getCompanyList = function(data,callback){
 		var companies = [];
-		db.CompanyList.find(query,{_id:0,SYMBOL:1},function(err,companiesList){
-			if(!err && companiesList){
-				var i=0,n=companiesList.length;
-				function cLoop(i){
-					companies.push(companiesList[i].SYMBOL);
-					i++;
-					if(i>=n)
-						callback(companies)
-					else
-						cLoop(i);
-						
-				}cLoop(i)
-			}else{
-				callback([])
-			}
-		})
+		if(data.type == "all"){
+			db.CompanyList.find({},{_id:0,SYMBOL:1},function(err,companiesList){
+				if(!err && companiesList){
+					var i=0,n=companiesList.length;
+					function cLoop(i){
+						companies.push(companiesList[i].SYMBOL);
+						i++;
+						if(i>=n)
+							callback(companies)
+						else
+							cLoop(i);
+							
+					}cLoop(i)
+				}else{
+					callback([])
+				}
+			})
+		}else{
+			db.Report.find({"pDetails.pId":data.pId},{_id:0,"cDetails.cName":1},function(err,companiesList){
+				if(!err && companiesList){
+					console.log(companiesList)
+					var i=0,n=companiesList.length;
+					function cLoop(i){
+						companies.push(companiesList[i].cDetails.cName);
+						i++;
+						if(i>=n)
+							callback(companies)
+						else
+							cLoop(i);
+							
+					}cLoop(i)
+				}else{
+					callback([])
+				}
+			})
+		}
 	}
 }
 module.exports.reportModule = reportModule;
