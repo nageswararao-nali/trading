@@ -17,7 +17,7 @@
           console.log(data)
           var p='<option value="">All</option>';
           for(var x=0;x < data.length ;x++){
-            p+='<option value="'+ data[x]._id +'">'+data[x].pName+'</option>'
+            p+='<option value="'+ data[x].pName +'">'+data[x].pName+'</option>'
           } 
           $("#portfolio").html(p);    
         })
@@ -25,7 +25,7 @@
         socket.on('ReportType',function(data){
           var p='';
           for(var x=0;x < data.length ;x++){
-            p+='<option value="'+ data[x]._id +'">'+data[x].rTName+'</option>'
+            p+='<option value="'+ data[x].rTName +'">'+data[x].rTName+'</option>'
           } 
           $("#reportType").html(p);    
         })

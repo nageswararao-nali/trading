@@ -1,16 +1,7 @@
 var commonActions = require("./commonActions").commonActions;
 function userModule(db){
 	var common = new commonActions(db);
-	this.getUserInfo = function(selectQuery,callback){
-		
-		common.getUserData(selectQuery,function(data){
-			if(data){
-				console.log("data found ===> ")
-				//console.log(data)
-				callback(data)
-			}
-		})
-	}
+
 
 	this.addPortfolio = function(selectQuery,callback){
 		db.Portfolio.find({pName:selectQuery.pName},function(err,info){

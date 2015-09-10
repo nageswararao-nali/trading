@@ -20,16 +20,16 @@
           } 
           $("#cId").html(p);    
         })
-        var rTId = $("#rTId").val();
-        var pId = $("#pId").val();
+        var rTName = $("#rTName").val();
+        var pName = $("#pName").val();
         var type = "all"
-        if(rTId == "55ed417c0f3a77fe136cac9b"){
+        if(rTName == "55ed417c0f3a77fe136cac9b"){
           type = "portfolio";
           alert("if")
         }else{
           alert("else")
         }
-        socket.emit('getCompanyList',{rTId:rTId,pId:pId,type:type})
+        socket.emit('getCompanyList',{rTName:rTName,pName:pName,type:type})
         socket.on('getCompanyList',function(companies){
           var companylist = companies;
           $( "#cName" ).autocomplete({
@@ -49,13 +49,15 @@
         $("#sale-form").submit(function(e){
           e.preventDefault();
           var data = {
-            pId : $("#pId").val(),
-            rTId : $("#rTId").val(),
-            cId : $("#cId").val(),
+            pName : $("#pName").val(),
+            rTName : $("#rTName").val(),
+            cName : $("#cName").val(),
             quantity : $("#quantity").val(),
             price : $("#price").val()
           }
           // alert()
+               console.log('buy data '+data+' stringify '+JSON.stringify(data))
+     
           socket.emit('sellSharesFromOrg',data)
           
         })
@@ -96,8 +98,8 @@
               <font color='white'>
                   <center><h2>Sale</h2></center>
                   <hr>
-                  <input type="hidden" name="pId" id="pId" value="{{portfolio}}">
-                  <input type="hidden" name="rTId" id="rTId" value="{{reportType}}">
+                  <input type="hidden" name="pName" id="pName" value="{{portfolio}}">
+                  <input type="hidden" name="rTName" id="rTName" value="{{reportType}}">
                   <div class="form-group">
                     <div class="form-fields">
                       <span class="form-label">

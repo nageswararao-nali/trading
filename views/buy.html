@@ -16,13 +16,13 @@
         socket.on('getCompanies',function(data){
           var p='<option value="">Select</option>';
           for(var x=0;x < data.length ;x++){
-            p+='<option value="'+ data[x]._id +'">'+data[x].cName+'</option>'
+            p+='<option value="'+ data[x].cName +'">'+data[x].cName+'</option>'
           } 
           $("#cId").html(p);    
         })
-        var rTId = $("#rTId").val();
-        var pId = $("#pId").val();
-        socket.emit('getCompanyList',{rTId:rTId,pId:pId,type:"all"})
+        var rTName = $("#rTName").val();
+        var pName = $("#pName").val();
+        socket.emit('getCompanyList',{rTName:rTName,pName:pName,type:"all"})
         socket.on('getCompanyList',function(companies){
           var companylist = companies;
           $( "#cName" ).autocomplete({
@@ -32,12 +32,13 @@
         $("#buy-form").submit(function(e){
           e.preventDefault();
           var data = {
-            pId : $("#pId").val(),
-            rTId : $("#rTId").val(),
+            pName : $("#pName").val(),
+            rTName : $("#rTName").val(),
             cName : $("#cName").val(),
             quantity : $("#quantity").val(),
             price : $("#price").val()
           }
+          console.log('buy data '+data+' stringify '+JSON.stringify(data))
           socket.emit('buySharesFromOrg',data)
 
           
@@ -79,8 +80,8 @@
               <font color='white'>
                   <center><h2>Buy</h2></center>
                   <hr>
-                  <input type="hidden" name="pId" id="pId" value="{{portfolio}}">
-                  <input type="hidden" name="rTId" id="rTId" value="{{reportType}}">
+                  <input type="hidden" name="pName" id="pName" value="{{portfolio}}">
+                  <input type="hidden" name="rTName" id="rTName" value="{{reportType}}">
                   <div class="form-group">
                     <div class="form-fields">
                       <span class="form-label">

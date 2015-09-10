@@ -43,8 +43,8 @@ exports.ReportType = mongoose.model('ReportType' , {
       "createDate" : Date
   },"ReportType")
 exports.Report = mongoose.model('Report' , {
-      "pDetails" : Object,
-      "cDetails" : Object,
+      "pName" : String,
+      "cName" : String,
       "quantity" : Number,
       "price" : Number,
       "total" : Number,
@@ -53,8 +53,8 @@ exports.Report = mongoose.model('Report' , {
       "lastUpdate" : Date
   },"Report")
 exports.RHistory = mongoose.model('RHistory' , {
-      "pDetails" : Object,
-      "cDetails" : Object,
+      "pName" : String,
+      "cName" : String,
       "quantity" : Number,
       "price" : Number,
       "buyOrSale" : String,
