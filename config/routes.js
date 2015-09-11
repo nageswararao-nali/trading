@@ -41,7 +41,7 @@ module.exports = function(app,db){
 			if(reportDetails === undefined){
 				res.redirect("/dashboard")
 			}else{
-      			res.render("buy.html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
+      			res.render("buy.html",{activeMenu:"buy",activeTab:"",portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
 			}
 		}else{
       		res.render("adminLogin.html");
@@ -53,7 +53,7 @@ module.exports = function(app,db){
       		if(reportDetails === undefined){
 				res.redirect("/dashboard")
 			}else{
-      			res.render("sale.html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
+      			res.render("sale.html",{activeMenu:"sale",activeTab:"",portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
 			}
 		}else{
       		res.render("adminLogin.html");
@@ -66,7 +66,7 @@ module.exports = function(app,db){
 				res.redirect("/dashboard")
 			}else{
 				var reportPage = req.param("reportType");
-      			res.render(reportPage+".html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
+      			res.render(reportPage+".html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType,activeMenu:"report",activeTab:reportPage});
 			}
 		}else{
       		res.render("adminLogin.html");
@@ -74,14 +74,22 @@ module.exports = function(app,db){
 	});
 	app.get('/dashboard',function(req,res){
 		if(req.session.isUserLoggedIn){
-      		res.render("dashboard.html");
+      		res.render("dashboard.html",{activeMenu:"home",activeTab:""});
 		}else{
       		res.render("adminLogin.html");
 		}
 	});
-	app.get('/admin/addNewPortfolio',function(req,res){
+	app.get('/admin/:adminAction',function(req,res){
 		if(req.session.isUserLoggedIn){
-      		res.render("addNewPortfolio.html");
+			var adminAction = req.param("adminAction");
+      		res.render(adminAction+".html",{activeMenu:"home",activeTab:adminAction});
+		}else{
+      		res.render("adminLogin.html");
+		}
+	});
+	/*app.get('/admin/addNewPortfolio',function(req,res){
+		if(req.session.isUserLoggedIn){
+      		res.render("addNewPortfolio.html",{activeMenu:"home",activeTab:""});
 		}else{
       		res.render("adminLogin.html");
 		}
@@ -95,11 +103,18 @@ module.exports = function(app,db){
 	});
 	app.get('/admin/addNewReportType',function(req,res){
 		if(req.session.isUserLoggedIn){
-      		res.render("addNewReportType.html");
+      		res.render("addNewReportType.html",{activeMenu:"home",activeTab:""});
 		}else{
       		res.render("adminLogin.html");
 		}
 	});
+	app.get('admin/updatePortfolio',function(req,res){
+		if(req.session.isUserLoggedIn){
+      		res.render("updatePortfolio.html",{activeMenu:"home",activeTab:""});
+		}else{
+      		res.render("adminLogin.html");
+		}
+	});*/
 	app.get('/logout',function(req,res){
 		req.session.destroy(function(err) {
 		  // cannot access session here
