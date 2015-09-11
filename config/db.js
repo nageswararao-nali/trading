@@ -1,10 +1,6 @@
 var mongoose = require('mongoose');
 var d1 = new Date();
 mongoose.connect('mongodb://localhost/Trading',function(err, db){
-// mongoose.connect('mongodb://192.168.0.139:27017/Trading',function(err, db){
-//mongoose.connect('mongodb://54.254.193.61:27017/ServerModules',function(err, db){
-// mongoose.connect('mongodb://192.168.0.148:27017/ServerModules',function(err, db){
-
   if(err)
     console.log(err)
   else{
@@ -13,10 +9,11 @@ mongoose.connect('mongodb://localhost/Trading',function(err, db){
   }
 });
 
-exports.Portfolio = mongoose.model('Portfolio' , {
+exports.portFolio = mongoose.model('portFolio' , {
       "pName" : String,
-      "createDate" : Date
-  },"Portfolio")
+      "capital" : Number,
+      "date" : Date
+  },"portFolio")
 exports.Company = mongoose.model('Company' , {
       "cName" : String,
       "createDate" : Date
@@ -69,3 +66,21 @@ exports.portFolioBuyInfo = mongoose.model('portFolioBuyInfo' , {
       "buyValue" : Number,
       "date" : Date
   },"portFolioBuyInfo")
+exports.portFolioDividend = mongoose.model('portFolioDividend' , {
+      "pName" : String,
+      "value" : Number,
+      "description" : String,
+      "date" : Date
+  },"portFolioDividend")
+exports.portFolioCashInFlow = mongoose.model('portFolioCashInFlow' , {
+      "pName" : String,
+      "value" : Number,
+      "description" : String,
+      "date" : Date
+  },"portFolioCashInFlow")
+exports.portFolioCashOutFlow = mongoose.model('portFolioCashOutFlow' , {
+      "pName" : String,
+      "value" : Number,
+      "description" : String,
+      "date" : Date
+  },"portFolioCashOutFlow")

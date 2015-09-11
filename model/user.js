@@ -4,11 +4,13 @@ function userModule(db){
 
 
 	this.addPortfolio = function(selectQuery,callback){
-		db.Portfolio.find({pName:selectQuery.pName},function(err,info){
+		db.portFolio.find({pName:selectQuery.pName},function(err,info){
 			if(!err && info.length>0){
 				callback({status:"this Portfolio name already exists"})
 			}else{
-				new db.Portfolio({pName:selectQuery.pName,createDate:new Date()}).save(function(err,saved){
+				console.log(selectQuery)
+				var pDetails = {pName:selectQuery.pName, capital:selectQuery.capital, date : new Date()}
+				new db.portFolio(pDetails).save(function(err,saved){
 					if(!err && saved){
 						callback({status:"new Portfolio added successfully"})
 					}else{
@@ -54,7 +56,7 @@ function userModule(db){
 	}
 
 	this.getPortfolio = function(selectQuery,callback){
-		db.Portfolio.find(selectQuery).sort({'createDate':1}).exec(function(err,docs){
+		db.portFolio.find(selectQuery).sort({'createDate':1}).exec(function(err,docs){
 		 	if(err)
 		 		console.log('error'+err)
 		 	else{

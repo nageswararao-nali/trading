@@ -278,7 +278,7 @@ var async = require('async')
 		}
 	}
 	this.getPortfolios = function(data,callback){
-		db.Portfolio.find({},function(err,PortfolioList){
+		db.portFolio.find({},function(err,PortfolioList){
 			if(!err && PortfolioList.length){
 				callback(PortfolioList)
 			}else{

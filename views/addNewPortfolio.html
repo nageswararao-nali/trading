@@ -17,6 +17,7 @@
           e.preventDefault();
           var data = {
             pName : $("#pName").val(),
+            capital : $("#capital").val()
 
           }
           socket.emit('addPortfolio',data)
@@ -59,6 +60,18 @@
                     <div class="form-fields">
                       <span  class="form-field">
                         <input type="text" name="pName" id="pName">
+                      </span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-fields">
+                      <span class="form-label">
+                        <label><b>Capital :</b></label>
+                      </span>
+                    </div>
+                    <div class="form-fields">
+                      <span  class="form-field">
+                        <input type="text" name="capital" id="capital">
                       </span>
                     </div>
                   </div>
