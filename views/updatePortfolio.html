@@ -12,39 +12,15 @@
     <script>
       var socket = io.connect();
       $(document).ready(function(){
-        socket.emit('getCompanies','hi')
-        socket.on('getCompanies',function(data){
+        socket.emit('getPortfolios','hi')
+        socket.on('getPortfolios',function(data){
           var p='<option value="">Select</option>';
           for(var x=0;x < data.length ;x++){
-            p+='<option value="'+ data[x]._id +'">'+data[x].cName+'</option>'
+            p+='<option value="'+ data[x].pName +'">'+data[x].pName+'</option>'
           } 
-          $("#cId").html(p);    
+          $("#portfolio").html(p);    
         })
-        var rTName = $("#rTName").val();
-        var pName = $("#pName").val();
-        var type = "all"
-        if(rTName == "55ed417c0f3a77fe136cac9b"){
-          type = "portfolio";
-        }else{
-        }
-        socket.emit('getCompanyList',{rTName:rTName,pName:pName,type:type})
-        socket.on('getCompanyList',function(companies){
-          var companylist = companies;
-          $( "#cName" ).autocomplete({
-            source: companylist
-          });
-        })
-        /*$("#cId").on("change",function(){
-          socket.emit('getCmp',{company:$("#cId option:selected").text()})
-          socket.on('getCmp',function(data){
-              if($("#price").val(data.CMP) !== undefined)
-                $("#price").val(data.CMP)
-              else
-                $("#price").val(0)
-              // $("#price").attr("disabled","disabled")
-          })
-        })*/
-        $("#sale-form").submit(function(e){
+        $("#buy-form").submit(function(e){
           e.preventDefault();
           var data = {
             pName : $("#pName").val(),
@@ -53,14 +29,11 @@
             quantity : $("#quantity").val(),
             price : $("#price").val()
           }
-          // alert()
-               console.log('buy data '+data+' stringify '+JSON.stringify(data))
-     
-          socket.emit('sellSharesFromOrg',data)
-          
+          console.log('buy data '+data+' stringify '+JSON.stringify(data))
+          socket.emit('buySharesFromOrg',data)
         })
-        socket.on('sellSharesFromOrg',function(data){
-             $("#sale-form")[0].reset();
+        socket.on('buySharesFromOrg',function(data){
+             $("#buy-form")[0].reset();
              alert(data.status)
         })
       })
@@ -81,53 +54,70 @@
         <!-- <p>hi raheem</p> -->
         <div class="main-content">
           <div>
-            <form action="/savereportDetails" id="sale-form" method="POST">
+            <form action="/savereportDetails" id="buy-form" method="POST">
               <font color='white'>
-                  <center><h2>Sale</h2></center>
+                  <center><h2>Buy</h2></center>
                   <hr>
                   <input type="hidden" name="pName" id="pName" value="{{portfolio}}">
                   <input type="hidden" name="rTName" id="rTName" value="{{reportType}}">
                   <div class="form-group">
                     <div class="form-fields">
                       <span class="form-label">
-                        <label><b>Company Name :</b></label>
+                        <label><b>Portfolio :</b></label>
                       </span>
                     </div>
                     <div class="form-fields">
                       <span  class="form-field">
-                        <!-- <select name="cId" id="cId">
+                        <select name="portfolio" id="portfolio">
                           <option value="">--select--</option>
-                        </select> -->
-                        <input type="text" name="cName" id="cName">
+                        </select>
                       </span>
                     </div>
                   </div>
                   <div class="form-group">
                     <div class="form-fields">
                       <span class="form-label">
-                        <label><b>Quantity :</b></label>
+                        <label><b>Cash :</b></label>
                       </span>
                     </div>
                     <div class="form-fields">
                       <span  class="form-field">
-                        <input type="text" name="quantity" id="quantity">
+                        <!-- <input type="text" name="dividend" id="dividend"> -->
+                        <select name="cashType" id="cashType">
+                          <option value="">Select</option>
+                          <option value="dividend">Dividend/Profit Earned</option>
+                          <option value="outflow">Cash Out-flow</option>
+                          <option value="inflow">Cash In-flow</option>
+                        </select>
                       </span>
                     </div>
                   </div>
                   <div class="form-group">
                     <div class="form-fields">
                       <span class="form-label">
-                        <label><b>Price :</b></label>
+                        <label><b>Amount :</b></label>
                       </span>
                     </div>
                     <div class="form-fields">
                       <span  class="form-field">
-                        <input type="text" name="price" id="price">
+                        <input type="text" name="amount" id="amount">
+                      </span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-fields">
+                      <span class="form-label">
+                        <label><b>Description :</b></label>
+                      </span>
+                    </div>
+                    <div class="form-fields">
+                      <span  class="form-field">
+                        <input type="text" name="description" id="description">
                       </span>
                     </div>
                   </div>
                   <center>
-                    <input type="submit" value="Sale" class="button" id='sale'>
+                    <input type="submit" value="Buy" class="button" id='buy'>
                   </center>
                   <hr>
               </font> 

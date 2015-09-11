@@ -114,7 +114,7 @@ function parseCsvFile(csvFilePath){
                     i++;
                     headerValCallback()
                 },function(){
-                	dataObj.lastUpdate = new Date();
+                	// dataObj.lastUpdate = new Date();
                     reportData.push(dataObj)
                     callback();
                 })
@@ -127,15 +127,23 @@ function parseCsvFile(csvFilePath){
 	  },function(){
 	    // console.log(reportData)
 	  	// console.log("parse completed")
-	  	async.eachSeries(reportData, function (fieldValue, headerValCallback) {
+	  	/*async.eachSeries(reportData, function (fieldValue, headerValCallback) {
 	        db.CompanyList.update({SYMBOL:fieldValue.SYMBOL},{$set:fieldValue},{upsert:true},function(err,upd){
 	        	headerValCallback()
 	        })
 	    },function(){
 	        console.log("cmp updated successfully")
-	    })
+	    })*/
+		var cListData = {};
+		cListData.cList = reportData;
+		cListData.createDate = new Date();
+		var cListDataQuery = new db.CompanyList(cListData) 
+		cListDataQuery.save(function(err,list){
+			if(!err && list){
+				console.log("cmp updated successfully")	
+			}
+		})
 	  })
-		// console.log(data)
 	})
 	fs.createReadStream(inputFile).pipe(parser);
 }

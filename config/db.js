@@ -21,7 +21,7 @@ exports.Company = mongoose.model('Company' , {
       "cName" : String,
       "createDate" : Date
   },"Company")
-exports.CompanyList = mongoose.model('CompanyList' , { 
+/*exports.CompanyList = mongoose.model('CompanyList' , { 
     'SYMBOL': String,
     'SERIES': String,
     'OPEN': Number,
@@ -36,15 +36,18 @@ exports.CompanyList = mongoose.model('CompanyList' , {
     'TOTALTRADES': Number,
     'ISIN': String,
     'lastUpdate': Date 
-  } ,"CompanyList")
-
+  } ,"CompanyList")*/
+exports.CompanyList = mongoose.model('CompanyList' , {
+      "cList" : Array,
+      "createDate" : Date
+  },"CompanyList")
 exports.ReportType = mongoose.model('ReportType' , {
       "rTName" : String,
       "createDate" : Date
   },"ReportType")
 exports.Report = mongoose.model('Report' , {
-      "pName" : Object,
-      "cName" : Object,
+      "pName" : String,
+      "cName" : String,
       "quantity" : Number,
       "price" : Number,
       "total" : Number,
@@ -53,8 +56,8 @@ exports.Report = mongoose.model('Report' , {
       "lastUpdate" : Date
   },"Report")
 exports.RHistory = mongoose.model('RHistory' , {
-      "pDetails" : Object,
-      "cDetails" : Object,
+      "pName" : String,
+      "cName" : String,
       "quantity" : Number,
       "price" : Number,
       "buyOrSale" : String,

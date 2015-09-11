@@ -27,6 +27,12 @@ function reportSocketCalls(report,db,socket){
 			socket.emit('getCompanyList',result);
 		})
 	})
+	socket.on('getPortfolios',function(data){
+		report.getPortfolios(data,function(result){
+			socket.emit('getPortfolios',result);
+		})
+	})
+	
 	
 	
 

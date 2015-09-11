@@ -4,22 +4,15 @@ function reportModule(db){
 	this.buySharesFromOrg = function(data,callback){
 		// console.log(JSON.stringify(data))
 		// {"pId":"","rTId":"55e7d548bf3390c511fbeaf8","cId":"55e810a7c49b68c812b7f780","quantity":"100","price":"15"}
-		getPortfolioById(data.pId,function(pData){
-			getCompanyById(data.cName,function(cData){
-				data.pDetails = pData;
-				data.cDetails = cData;
-				delete data.pId;
-				delete data.cId;
-				delete data.rTId;
 				storeInRHistory(data,'buy');
-				db.Report.findOne({ 'pDetails._id': data.pDetails._id, 'cDetails._id': data.cDetails._id },function(err,doc){
+				db.Report.findOne({ 'pName': data.pName, 'cName': data.cName },function(err,doc){
 					if(!err && doc){
 						var quantity = parseInt(doc.quantity) + parseInt(data.quantity);
 						var price = ((parseInt(doc.price) + parseInt(data.price))/2);
 						price = parseFloat(Math.round(price * 100) / 100).toFixed(2);
 						var total = parseFloat(Math.round(quantity * price * 100) / 100).toFixed(2);
 						var lastUpdate = new Date();
-						db.Report.update({ 'pDetails._id': data.pDetails._id, 'cDetails._id': data.cDetails._id },{$set:{quantity:quantity,price:price,total:total,lastUpdate:lastUpdate}},function(err,docResult){
+						db.Report.update({ 'pName': data.pName, 'cName': data.cName },{$set:{quantity:quantity,price:price,total:total,lastUpdate:lastUpdate}},function(err,docResult){
 							if(!err && docResult)
 								callback({'status':'update success'});
 							else{
@@ -43,19 +36,12 @@ function reportModule(db){
 						})
 					}
 				})
-			})
-		})
+		
 	}
 	this.sellSharesFromOrg = function(data,callback){
-		getPortfolioById(data.pId,function(pData){
-			getCompanyById(data.cId,function(cData){
-				data.pDetails = pData;
-				data.cDetails = cData;
-				delete data.pId;
-				delete data.cId;
-				delete data.rTId;
+
 				storeInRHistory(data,'sell');
-				db.Report.findOne({ 'pDetails._id': data.pDetails._id, 'cDetails._id': data.cDetails._id },function(err,doc){
+				db.Report.findOne({ 'pName': data.pName, 'cName': data.cName},function(err,doc){
 					if(!err && doc){
 					 	var quantity = parseInt(doc.quantity) - parseInt(data.quantity);
 						if(quantity >= 0){
@@ -89,8 +75,7 @@ function reportModule(db){
 						callback({'status':'dont have enough shares to sell'});
 					}
 				})
-			})
-		})
+	
 	}
 	function getPortfolioById(pId,callback){
 		db.Portfolio.findOne({ '_id' : pId },{'__v':0,'createDate':0}).exec(function(err,pData){
@@ -124,8 +109,8 @@ function reportModule(db){
 	}
 	function storeInRHistory(data,buyOrSale){
 		new db.RHistory({
-		      "pDetails" : data.pDetails,
-		      "cDetails" : data.cDetails,
+		      "pName" : data.pName,
+		      "cName" : data.cName,
 		      "quantity" : data.quantity,
 		      "price" : data.price,
 		      "buyOrSale" : buyOrSale,
@@ -138,19 +123,18 @@ function reportModule(db){
 		  })
 	}
 	this.getReports = function(data,callback){
-		getPortfolioById(data.pId,function(pData){
-			var query = {"pDetails._id" : pData._id}
+			var query = {"pName" : data.pName}
 			db.Report.find(query).sort({lastUpdate:-1}).exec(function(err,reports){
 				if(!err && reports.length){
 					var j=0;var reportsCon =[];
 					var n = reports.length;
 					function rLoop(j){
 						var report = reports[j];
-						db.CompanyList.findOne({SYMBOL:report.cDetails.cName},function(err,companyDetails){
+						db.CompanyList.findOne({SYMBOL:report.cName},function(err,companyDetails){
 							if(!err && companyDetails){
 								var rp = {};
-								rp.cDetails = report.cDetails;
-								rp.pDetails = report.pDetails;
+								rp.cName = report.cName;
+								rp.pName = report.pName;
 								rp.quantity = report.quantity;
 								rp.price = report.price;
 								rp.total = report.total;
@@ -184,7 +168,6 @@ function reportModule(db){
 					callback({})
 				}
 			})
-		})
 	}
 	this.getCmp = function(query,callback){
 		db.Company.findOne(query,{_id:0,CMP:1},function(err,companyDetails){
@@ -233,6 +216,15 @@ function reportModule(db){
 				}
 			})
 		}
+	}
+	this.getPortfolios = function(data,callback){
+		db.Portfolio.find({},function(err,PortfolioList){
+			if(!err && PortfolioList.length){
+				callback(PortfolioList)
+			}else{
+				callback([])
+			}
+		})
 	}
 }
 module.exports.reportModule = reportModule;
