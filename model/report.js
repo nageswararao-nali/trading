@@ -1,41 +1,101 @@
 
 function reportModule(db){
 	// var common = new commonActions(db);
-	this.buySharesFromOrg = function(data,callback){
-		// console.log(JSON.stringify(data))
-		// {"pId":"","rTId":"55e7d548bf3390c511fbeaf8","cId":"55e810a7c49b68c812b7f780","quantity":"100","price":"15"}
-				storeInRHistory(data,'buy');
-				db.Report.findOne({ 'pName': data.pName, 'cName': data.cName },function(err,doc){
-					if(!err && doc){
-						var quantity = parseInt(doc.quantity) + parseInt(data.quantity);
-						var price = ((parseInt(doc.price) + parseInt(data.price))/2);
-						price = parseFloat(Math.round(price * 100) / 100).toFixed(2);
-						var total = parseFloat(Math.round(quantity * price * 100) / 100).toFixed(2);
-						var lastUpdate = new Date();
-						db.Report.update({ 'pName': data.pName, 'cName': data.cName },{$set:{quantity:quantity,price:price,total:total,lastUpdate:lastUpdate}},function(err,docResult){
-							if(!err && docResult)
-								callback({'status':'update success'});
-							else{
-								console.log('error:'+err);
-								callback({'status':'update fail'})
-							}
-						})
-					}else{
-						data.createDate = new Date();
-						data.releaseMark = 0;
-						var price = data.price;
-						data.total = parseFloat(Math.round(data.quantity * price * 100) / 100).toFixed(2);
-						console.log(data)
-						new db.Report(data).save(function(err,doc){
-							if(!err && doc)
-								callback({'status':'success'});
-							else{
-								console.log('error in save:'+err);
-								callback({'status':'fail'});
-							}
-						})
+var async = require('async')
+	function addBasicBuyInfo(data,callback){
+		storeInRHistory(data,'buy');
+		db.Report.findOne({ 'pName': data.pName, 'cName': data.cName },function(err,doc){
+			if(!err && doc){
+				var quantity = parseInt(doc.quantity) + parseInt(data.quantity);
+				var price = ((parseInt(doc.price) + parseInt(data.price))/2);
+				price = parseFloat(Math.round(price * 100) / 100).toFixed(2);
+				var total = parseFloat(Math.round(quantity * price * 100) / 100).toFixed(2);
+				var lastUpdate = new Date();
+				db.Report.update({ 'pName': data.pName, 'cName': data.cName },{$set:{quantity:quantity,price:price,total:total,lastUpdate:lastUpdate}},function(err,docResult){
+					if(!err && docResult)
+						callback({'status':'update success'});
+					else{
+						console.log('error:'+err);
+						callback({'status':'update fail'})
 					}
 				})
+			}else{
+				data.createDate = new Date();
+				data.releaseMark = 0;
+				var price = data.price;
+				data.total = parseFloat(Math.round(data.quantity * price * 100) / 100).toFixed(2);
+				console.log(data)
+				new db.Report(data).save(function(err,doc){
+					if(!err && doc)
+						callback({'status':'success'});
+					else{ 
+						console.log('error in save:'+err);
+						callback({'status':'fail'});
+					}
+				})
+			}
+		})
+	}
+
+	// addBuyToPortfolio("djf",function(){
+
+	// })
+
+	function addBuyToPortfolio(data,callback){
+
+		var cDate = new Date()
+		var dateString = cDate.toJSON().slice(0, 10)
+
+		db.portFolioBuyInfo.find({pName : data.pName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
+			if(!err && result.length>0){
+				console.log('result '+result[0]._id);
+				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);;
+				var finalTotal = total + result[0].buyValue;
+				db.portFolioBuyInfo.update({_id:result[0]._id},{buyValue : finalTotal },function(err,updated){
+					if(!err && updated){
+						console.log('updated success')
+						callback()
+					}
+				})
+			}else{
+				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
+				//var finalTotal = total + buyData.buyValue;
+				new db.portFolioBuyInfo({pName : data.pName, buyValue : total, date : new Date()}).save(function(err,saved){
+					if(!err && saved){
+						callback()
+					}
+				})
+			}	
+		})
+	}
+
+	function addBuyToBalances(data,callback){
+		callback()
+	}
+
+	this.buySharesFromOrg = function(data,maincallback){
+		async.parallel([
+			function(callback){
+				addBasicBuyInfo(data,function(result){
+					status = result;
+					callback()
+				})
+		    },function(callback){
+		    	addBuyToPortfolio(data,function(info){
+		    		callback()
+		    	})
+			},function(callback){
+		    	addBuyToBalances(data,function(info){
+		    		callback()
+		    	})
+			}],
+			function(err,result){
+				console.log('buy success '+status)
+			}
+		)
+		// console.log(JSON.stringify(data))
+		// {"pId":"","rTId":"55e7d548bf3390c511fbeaf8","cId":"55e810a7c49b68c812b7f780","quantity":"100","price":"15"}
+
 		
 	}
 	this.sellSharesFromOrg = function(data,callback){
