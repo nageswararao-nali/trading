@@ -4,7 +4,7 @@ function userModule(db){
 
 
 	this.addPortfolio = function(selectQuery,callback){
-		db.Portfolio.find({pName:selectQuery.pName},function(err,info){
+		db.portFolio.find({pName:selectQuery.pName},function(err,info){
 			if(!err && info.length>0){
 				callback({status:"this Portfolio name already exists"})
 			}else{
@@ -54,7 +54,7 @@ function userModule(db){
 	}
 
 	this.getPortfolio = function(selectQuery,callback){
-		db.Portfolio.find(selectQuery).sort({'createDate':1}).exec(function(err,docs){
+		db.portFolio.find(selectQuery).sort({'createDate':1}).exec(function(err,docs){
 		 	if(err)
 		 		console.log('error'+err)
 		 	else{

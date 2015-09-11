@@ -13,10 +13,11 @@ mongoose.connect('mongodb://localhost/Trading',function(err, db){
   }
 });
 
-exports.Portfolio = mongoose.model('Portfolio' , {
+exports.portFolio = mongoose.model('portFolio' , {
       "pName" : String,
-      "createDate" : Date
-  },"Portfolio")
+      "capital" : Number,
+      "date" : Date
+  },"portFolio")
 exports.Company = mongoose.model('Company' , {
       "cName" : String,
       "createDate" : Date
@@ -66,3 +67,10 @@ exports.portFolioBuyInfo = mongoose.model('portFolioBuyInfo' , {
       "buyValue" : Number,
       "date" : Date
   },"portFolioBuyInfo")
+
+exports.portFolioBalances = mongoose.model('portFolioBalances' , {
+      "pName" : String,
+      "openBal" : Number,
+      "closeBal" : Number,
+      "date" : Date
+  },"portFolioBalances")
