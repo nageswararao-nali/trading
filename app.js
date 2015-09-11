@@ -6,6 +6,7 @@ var express = require('express')
   , routes = require('./config/routes'); 
 require('./config');
 var db = require("./config/db");
+var async = require("async")
 app.engine('html', cons.swig);
 app.set('view engine', 'html');
 app.use(expressSession({

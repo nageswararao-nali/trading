@@ -64,4 +64,8 @@ exports.RHistory = mongoose.model('RHistory' , {
       "createDate" : Date
   },"RHistory")
 
-
+exports.portFolioBuyInfo = mongoose.model('portFolioBuyInfo' , {
+      "pName" : String,
+      "buyValue" : Number,
+      "date" : Date
+  },"portFolioBuyInfo")
