@@ -16,7 +16,7 @@ function userModule(db){
 							pName : selectQuery.pName,
 							openBal : parseInt(selectQuery.equity) || 0,
 							closeBal : parseInt(selectQuery.equity) || 0,
-							type : "equity",
+							rTName : "Equity",
 							date : new Date()
 						}
 						exp = exp + (parseInt(selectQuery.futures) || 0);
@@ -26,7 +26,7 @@ function userModule(db){
 									pName : selectQuery.pName,
 									openBal : parseInt(selectQuery.futures) || 0,
 									closeBal : parseInt(selectQuery.futures) || 0,
-									type : "futures",
+									rTName : "Futures",
 									date : new Date()
 								}
 								exp = exp + (parseInt(selectQuery.futures) || 0)
@@ -37,7 +37,7 @@ function userModule(db){
 											pName : selectQuery.pName,
 											openBal : parseInt(selectQuery.commodity) || 0,
 											closeBal : parseInt(selectQuery.commodity) || 0,
-											type : "commodity",
+											rTName : "Commodities",
 											date : new Date()
 										}
 										exp = exp + (parseInt(selectQuery.commodity) || 0)
@@ -48,7 +48,7 @@ function userModule(db){
 													pName : selectQuery.pName,
 													openBal : parseInt(selectQuery.mutualfunds) || 0,
 													closeBal : parseInt(selectQuery.mutualfunds) || 0,
-													type : "mutualfunds",
+													rTName : "Mutual Funds",
 													date : new Date()
 												}
 												exp = exp + (parseInt(selectQuery.mutualfunds) || 0)
@@ -61,7 +61,7 @@ function userModule(db){
 															pName : selectQuery.pName,
 															openBal : bal,
 															closeBal : bal,
-															type : "cash",
+															rTName : "Cash",
 															date : new Date()
 														}
 														new db.portFolioBalances(portBalData).save(function(err,balances){
