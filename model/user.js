@@ -155,29 +155,7 @@ function userModule(db){
 				callback([]);
 		})
 	}
-	this.addExtraCash = function(data,callback){
-		var colName = "";
-		if(data.cashType === "dividend"){
-			colName = "portFolioDividend";
-		}else if(data.cashType === "inflow"){
-			colName = "portFolioCashInFlow";
-		}else if(data.cashType === "outflow"){
-			colName = "portFolioCashOutFlow";
-		}
-		var cashTypeData = {
-			"pName" : data.pName,
-			"value" : data.amount,
-			"description" : data.description,
-			"date" : new Date()
-		}
-		new db[colName](cashTypeData).save(function(err,cashTypeDataR){
-			if(!err && cashTypeDataR){
-				callback(null,cashTypeDataR)
-			}else{
-				callback("error in saving",{})
-			}
-		})
-	}
+
 	
 }
 module.exports.userModule = userModule;
