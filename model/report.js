@@ -50,7 +50,7 @@ var async = require('async')
 		var cDate = new Date()
 		var dateString = cDate.toJSON().slice(0, 10)
 
-		db.portFolioBuyInfo.find({pName : data.pName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
+		db.portFolioBuyInfo.find({pName : data.pName,rTName:data.rTName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
 			if(!err && result.length>0){
 				console.log('result '+result[0]._id);
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
@@ -65,7 +65,7 @@ var async = require('async')
 			}else{
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
 				//var finalTotal = total + buyData.buyValue;
-				new db.portFolioBuyInfo({pName : data.pName, buyValue : total, date : new Date()}).save(function(err,saved){
+				new db.portFolioBuyInfo({pName : data.pName,rTName:data.rTName,buyValue : total, date : new Date()}).save(function(err,saved){
 					if(!err && saved){
 						callback()
 					}
@@ -93,15 +93,15 @@ var async = require('async')
 		})
 	}
 
-	exFunction(function(){
-		console.log('exFunction completed')
-	})
+	// exFunction(function(){
+	// 	console.log('exFunction completed')
+	// })
 
 	function addBuyToBalances(data,callback){
 		var cDate = new Date()
 		var dateString = cDate.toJSON().slice(0, 10)
 
-		db.portFolioBalances.find({pName : data.pName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
+		db.portFolioBalances.find({pName : data.pName,rTName:data.rTName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
 			if(!err && result.length>0){
 				//console.log('result '+result[0]._id);
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
@@ -115,10 +115,10 @@ var async = require('async')
 			}else{
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
 				//var finalTotal = total + buyData.buyValue;
-				db.portFolioBalances.find({pName : data.pName}).sort({date:-1}).limit(1).exec(function(err,docs){
+				db.portFolioBalances.find({pName : data.pName,rTName:data.rTName}).sort({date:-1}).limit(1).exec(function(err,docs){
 					if(!err && docs.length>0){
 						console.log('closeBal '+docs[0].closeBal)
-						new db.portFolioBalances({pName : data.pName , openBal : docs[0].closeBal, closeBal : docs[0].closeBal, date: new Date()}).save(function(err,inserted){
+						new db.portFolioBalances({pName : data.pName ,rTName:data.rTName, openBal : docs[0].closeBal, closeBal : docs[0].closeBal, date: new Date()}).save(function(err,inserted){
 							if(!err && inserted){
 								console.log('inserted '+inserted+' JSON '+JSON.stringify(inserted))
 								var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
@@ -132,11 +132,19 @@ var async = require('async')
 							}
 						})						
 					}else{
-						db.portFolio.find({pName : data.pName },function(err,amountInfo){
+						db.portFolio.find({pName : data.pName,rTName:data.rTName },function(err,amountInfo){
 							if(!err && amountInfo){
-								new db.portFolioBalances({pName : data.pName , openBal : amountInfo[0].capital, closeBal : amountInfo[0].capital, date: new Date()}).save(function(err,inserted){
+								new db.portFolioBalances({pName : data.pName ,rTName:data.rTName, openBal : amountInfo[0].capital, closeBal : amountInfo[0].capital, date: new Date()}).save(function(err,inserted){
 									if(!err && inserted){
-										callback()
+										var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
+										var totalOpenBal = (parseFloat(Math.round(amountInfo[0].capital)).toFixed(2) - total);
+										db.portFolioBalances.update({_id:inserted._id},{closeBal : totalOpenBal },function(err,updated){
+											if(!err && updated){
+												//console.log('updated success')
+												callback()
+											}
+										})
+										//callback()
 									}
 								})
 							}
@@ -171,8 +179,8 @@ var async = require('async')
 		// console.log(JSON.stringify(data))
 		// {"pId":"","rTId":"55e7d548bf3390c511fbeaf8","cId":"55e810a7c49b68c812b7f780","quantity":"100","price":"15"}
 
-		
 	}
+
 	this.sellSharesFromOrg = function(data,callback){
 
 				storeInRHistory(data,'sell');
