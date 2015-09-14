@@ -12,7 +12,8 @@
     <script>
       var socket = io.connect();
       $(document).ready(function(){
-        
+        $("#fDate" ).datepicker();
+        $("#toDate" ).datepicker();
         $("#buy-form").submit(function(e){
           e.preventDefault();
           var rTName = $("#rTName").val();
@@ -20,9 +21,10 @@
           var from = $("#fDate").val();
           var to = $("#toDate").val();
           socket.emit('getPL',{rTName:rTName,pName:pName,from:from,to:to})
-          socket.on('getPL',function(companies){
-            
+          socket.on('getPL',function(PLData){
+            $("#PLData").html(PLData.pl)
           })
+        })
       })
     </script>
   </head>
@@ -81,6 +83,7 @@
               </font> 
             </form>
           </div>
+          <div id="PLData"></div>
         </div>
       </div>
     </section>

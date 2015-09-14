@@ -482,14 +482,197 @@ var async = require('async')
 		})
 	}
 	this.getPL = function(data,callback){
-		db.portFolio.find({},function(err,PortfolioList){
-			if(!err && PortfolioList.length){
-				callback(PortfolioList)
+		var closingValue,cash,purchases,sales,openingValue,dividend,inflow,outflow;
+		var rTName = data.rTName;
+		var pName = data.pName;
+		var from = getFromDate(data.from),to = getToDate(data.to);
+		function getPurchases(sCallback){
+			console.log("in purchases ........................")
+			if(rTName === ""){
+				getBuyDataByRT("Equity",function(rData){
+					purchases = parseInt(rData);
+					getBuyDataByRT("Futures",function(rData){
+						purchases += parseInt(rData);
+						getBuyDataByRT("Commodities",function(rData){
+							purchases += parseInt(rData);
+							getBuyDataByRT("Mutual Funds",function(rData){
+								purchases += parseInt(rData);
+								sCallback(calcPL)
+							})
+						})
+					})
+				})
 			}else{
-				callback([])
+				getBuyDataByRT(rTName,function(rData){
+					purchases = parseInt(rData);
+					sCallback(calcPL)
+				})
 			}
-		})
+		}
+		function calcPL(){
+			var PL = parseInt(closingValue) + parseInt(cash) + parseInt(purchases) - parseInt(sales) - parseInt(openingValue);
+			console.log(parseInt(closingValue) + " == " + parseInt(cash) + " == " + parseInt(purchases) + " == " + parseInt(sales) + " == " + parseInt(openingValue));
+			
+			console.log(" Profit / Loss value is ----------");
+			console.log(" ********************************************* ")
+			console.log(PL)
+			console.log(" ********************************************* ")
+			callback({pl:PL})
+		}
+		function getSales(sCallback){
+			console.log("in sales....................")
+			if(rTName === ""){
+				getSaleDataByRT("Equity",function(rData){
+					sales = parseInt(rData);
+					getSaleDataByRT("Futures",function(rData){
+						sales += parseInt(rData);
+						getSaleDataByRT("Commodities",function(rData){
+							sales += parseInt(rData);
+							getSaleDataByRT("Mutual Funds",function(rData){
+								sales += parseInt(rData);
+								sCallback()
+							})
+						})
+					})
+				})
+			}else{
+				getSaleDataByRT(rTName,function(rData){
+					sales = parseInt(rData);
+					sCallback()
+				})
+			}
+		}
+		function getBuyDataByRT(rTNameVal,rTcallback){
+			db.portFolioBuyInfo.find({date:{$gte:from,$lt:to},pName:pName,rTName:rTNameVal})
+			.sort({date:1})
+			.exec(function(err,rows){
+				var tot = 0;
+				if(!err && rows.length){
+					for(var i=0;i<rows.length;i++){
+						tot += parseInt(rows[i].buyValue);
+						console.log(i + " ==== " + rows.length)
+						if(i >= rows.length - 1)
+							rTcallback(tot)
+					}
+				}else{
+					console.log(" something happening " + err + " === " + rows)
+					rTcallback(tot)
+				}
+			})
+		}
+		function getSaleDataByRT(rTNameVal,rTcallback){
+			db.portFolioSaleInfo.find({date:{$gte:from,$lt:to},pName:pName,rTName:rTNameVal})
+			.sort({date:1})
+			.exec(function(err,rows){
+				var tot = 0;
+				if(!err && rows.length){
+					for(var i=0;i<rows.length;i++){
+						tot += parseInt(rows[i].saleValue);
+						if(i >= rows.length - 1)
+							rTcallback(tot)
+					}
+				}else{
+					console.log(" something happening " + err + " === " + rows)
+					rTcallback(tot)
+				}
+			})
+		}
+		function getCash(){
+			console.log("in get cash")
+			getDataByRT("Cash",function(rData){
+				/*closingValue += rData.closeBal;
+				openingValue += rData.openBal;*/
+				cash = parseInt(rData.closeBal);
+				getPurchases(getSales)
+			})
+		}
+		function getClosingValue(callback){
+			if(rTName === ""){
+				getDataByRT("Equity",function(rData){
+					closingValue = parseInt(rData.closeBal);
+					openingValue = parseInt(rData.openBal);
+					getDataByRT("Futures",function(rData){
+						closingValue += parseInt(rData.closeBal);
+						openingValue += parseInt(rData.openBal);
+						getDataByRT("Commodities",function(rData){
+							closingValue += parseInt(rData.closeBal);
+							openingValue += parseInt(rData.openBal);
+							getDataByRT("Mutual Funds",function(rData){
+								closingValue += parseInt(rData.closeBal);
+								openingValue += parseInt(rData.openBal);
+								callback()
+							})
+						})
+					})
+				})
+			}else{
+				getDataByRT(rTName,function(rData){
+					closingValue = parseInt(rData.closeBal);
+					openingValue = parseInt(rData.openBal);
+					callback()
+				})
+			}
+			
+		}
+		function getDataByRT(rTNameVal,rTcallback){
+			console.log(rTNameVal + " --------------------------> ")
+			db.portFolioBalances.find({date:{$gte:from,$lt:to},pName:pName,rTName:rTNameVal})
+			.sort({date:1})
+			.exec(function(err,rows){
+				if(!err && rows.length){
+					console.log(rows)
+					console.log(" ************************************* ")
+					var rData = {};
+					rData.openBal = rows[0].closeBal;
+					rData.closeBal = rows[rows.length-1].openBal;
+					rTcallback(rData)
+				}else if(err){
+					console.log("error in getting data " + err)
+				}else{
+					db.portFolioBalances.find({date:{$lte:from},pName:pName,rTName:rTName})
+					.sort({date:-1})
+					.limit(1)
+					.exec(function(err,rows){
+						if(!err && rows.length){
+							var rData = {};
+							rData.openBal = rows[0].closeBal;
+							rData.closeBal = rows[0].closeBal;
+							rTcallback(rData)
+						}else if(err){
+							console.log("error in getting data " + err)
+						}else{
+							console.log("no recs found ...")
+						}
+					})
+				}
+			})
+		}
+		getClosingValue(getCash);
 	}
-	
+
+	function getFromDate(fromDate){
+		var today = new Date(fromDate);
+	    var dd = today.getDate();
+	    var mm = today.getMonth()+1;
+	    var yyyy = today.getFullYear();
+	    today = mm+'/'+dd+'/'+yyyy;
+	    return new Date(today); 
+	}
+	function getToDate(toDate){
+		var today = new Date(toDate);
+	    var dd = today.getDate()+1;
+	    var mm = today.getMonth()+1;
+	    var yyyy = today.getFullYear();
+	    today = mm+'/'+dd+'/'+yyyy;
+	    return new Date(today); 
+	}
+	function getPreviousDate(toDate,callback){
+		var today = new Date(toDate);
+	    var dd = today.getDate()-1;
+	    var mm = today.getMonth()+1;
+	    var yyyy = today.getFullYear();
+	    today = mm+'/'+dd+'/'+yyyy;
+	    callback(new Date(today)) ; 
+	}
 }
 module.exports.reportModule = reportModule;
