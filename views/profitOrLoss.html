@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en"> 
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Quantum Leap</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="/assets/css/jquery-ui.css">
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script>
+      var socket = io.connect();
+      $(document).ready(function(){
+        
+        $("#buy-form").submit(function(e){
+          e.preventDefault();
+          var rTName = $("#rTName").val();
+          var pName = $("#pName").val();
+          var from = $("#fDate").val();
+          var to = $("#toDate").val();
+          socket.emit('getPL',{rTName:rTName,pName:pName,from:from,to:to})
+          socket.on('getPL',function(companies){
+            
+          })
+      })
+    </script>
+  </head>
+  <body>
+    <div class="header">
+      <div class="logoutCon">
+        <a href="/logout">
+          <button class="exit-btn exit-btn-4">Log Out</button>
+        </a>
+      </div>
+    </div>
+    <section class="container">
+      {% include "header.html" %}
+      {% include "reportSidebar.html" %}
+      <div class="content">
+        <!-- <p>hi raheem</p> -->
+        <div class="main-content">
+          <div>
+            <form action="/savereportDetails" id="buy-form" method="POST">
+              <font color='white'>
+                  <center><h2>Profit / Loss</h2></center>
+                  <hr>
+                  <input type="hidden" name="pName" id="pName" value="{{portfolio}}">
+                  <input type="hidden" name="rTName" id="rTName" value="{{reportType}}">
+                  <div class="form-group">
+                    <div class="form-fields">
+                      <span class="form-label">
+                        <label><b>From Date :</b></label>
+                      </span>
+                    </div>
+                    <div class="form-fields">
+                      <span  class="form-field">
+                        <!-- <select name="cId" id="cId">
+                          <option value="">--select--</option>
+                        </select> -->
+                        <input type="text" name="fDate" id="fDate">
+                      </span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-fields">
+                      <span class="form-label">
+                        <label><b>To Date :</b></label>
+                      </span>
+                    </div>
+                    <div class="form-fields">
+                      <span  class="form-field">
+                        <input type="text" name="toDate" id="toDate">
+                      </span>
+                    </div>
+                  </div>
+                  <center>
+                    <input type="submit" value="Buy" class="button" id='buy'>
+                  </center>
+                  <hr>
+              </font> 
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
