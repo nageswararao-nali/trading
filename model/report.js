@@ -365,5 +365,15 @@ var async = require('async')
 			}
 		})
 	}
+	this.getPL = function(data,callback){
+		db.portFolio.find({},function(err,PortfolioList){
+			if(!err && PortfolioList.length){
+				callback(PortfolioList)
+			}else{
+				callback([])
+			}
+		})
+	}
+	
 }
 module.exports.reportModule = reportModule;

@@ -32,6 +32,12 @@ function reportSocketCalls(report,db,socket){
 			socket.emit('getPortfolios',result);
 		})
 	})
+	socket.on('getPL',function(data){
+		report.getPL(data,function(result){
+			socket.emit('getPL',result);
+		})
+	})
+	
 	
 	
 	
