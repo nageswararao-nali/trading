@@ -45,6 +45,15 @@ module.exports = function(io,db,app){
 				socket.emit("addReportType",addCompanyInfo)
 			})
 		})
+		socket.on("addExtraCash",function(data){
+			user.addExtraCash(data,function(err,addExtraCashData){
+				if(!err)
+					socket.emit("addExtraCash",addExtraCashData)
+				else
+					console.log("error in saving extra cash details")
+			})
+		})
+		
 
 		
 	})

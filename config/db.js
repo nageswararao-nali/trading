@@ -84,3 +84,11 @@ exports.portFolioCashOutFlow = mongoose.model('portFolioCashOutFlow' , {
       "description" : String,
       "date" : Date
   },"portFolioCashOutFlow")
+exports.portFolioBalances = mongoose.model('portFolioBalances' , {
+      "pName" : String,
+      "openBal" : Number,
+      "closeBal" : String,
+      "type": String,
+      "date" : Date
+  },"portFolioBalances")
+

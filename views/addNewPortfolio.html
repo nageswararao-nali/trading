@@ -17,7 +17,11 @@
           e.preventDefault();
           var data = {
             pName : $("#pName").val(),
-            capital : $("#capital").val()
+            capital : $("#capital").val(),
+            equity : $("#equity").val(),
+            futures : $("#futures").val(),
+            commodity : $("#commodity").val(),
+            mutualfunds : $("#mutualfunds").val()
 
           }
           socket.emit('addPortfolio',data)
@@ -72,6 +76,55 @@
                     <div class="form-fields">
                       <span  class="form-field">
                         <input type="text" name="capital" id="capital">
+                      </span>
+                    </div>
+                  </div>
+                  <center><p> <b>Open Balances</b> </p></center>
+                  <div class="form-group">
+                    <div class="form-fields">
+                      <span class="form-label">
+                        <label><b>Equity  :</b></label>
+                      </span>
+                    </div>
+                    <div class="form-fields">
+                      <span  class="form-field">
+                        <input type="text" name="equity" id="equity">
+                      </span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-fields">
+                      <span class="form-label">
+                        <label><b>Futures :</b></label>
+                      </span>
+                    </div>
+                    <div class="form-fields">
+                      <span  class="form-field">
+                        <input type="text" name="futures" id="futures">
+                      </span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-fields">
+                      <span class="form-label">
+                        <label><b>Commodity :</b></label>
+                      </span>
+                    </div>
+                    <div class="form-fields">
+                      <span  class="form-field">
+                        <input type="text" name="commodity" id="commodity">
+                      </span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-fields">
+                      <span class="form-label">
+                        <label><b>Mutual Funds :</b></label>
+                      </span>
+                    </div>
+                    <div class="form-fields">
+                      <span  class="form-field">
+                        <input type="text" name="mutualfunds" id="mutualfunds">
                       </span>
                     </div>
                   </div>
