@@ -1,0 +1,20 @@
+Dear Sir/Madam,
+We are in the process of reviewing our press file generation system for faster dissemination of daily market statistics at the end of the day. 
+Currently, we provide the following files.  
+File Name	Short Description
+Anddmmyy.txt	Name of the co, its symbol and the announcements made during the day
+Bcddmmyy.dbf	Details of Corporate Action 
+Bmddmmyy.txt	Name of the co, its symbol board meeting date & purpose
+Bhddmmyy.txt	Details of Securities hit the day's price band, either high or low.
+Foddmmyyyy.zip	Details of Press files & market activity report for F&O segment.
+Glddmmyy.dbf	Top 10 gainers & losers along with the price variation under  these three categories : (1) Nifty, (2) Junior Nifty & (3) Other Category 
+Hlddmmyy.dbf	Details of Securities hitting the High/Low Price for the last 52 weeks.
+MAddmmyy.rtf	Analytical Report on the CM Market segment
+Pdddmmyy.dbf	Contains price & vol. of securities traded on the Exchange along with 5 indices. 
+Prddmmyy.dbf	Contains all the above fields except symbol & series.
+TTddmmyy.dbf	Details like Cl price, Previous Close Price, Trade Quantity  & Trade value for the Highest Traded 25 scripts for the day
+Readme.txt	Contains help manual for the press files in the CM segment.
+Prddmmyy.zip	Zip file containing all the above files except MAddmmyy.rtf
+It is suggested that all the above files will be either by comma separated value file or in text file. Hence, the following dbase file will be changed to comma separated value file  Bcddmmyy.dbf, Glddmmyy.dbf, Hlddmmyy.dbf, Ixddmmyy.dbf, Pdddmmyy.dbf, Prddmmyy.dbf and Ttddmmyy.dbf. And the Market Activity file, presently in rich text format, will be provided in comma separated value file. 
+
+In case of any feedback or querries in this regard, kindly call on 1800 2200 53

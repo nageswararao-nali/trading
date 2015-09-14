@@ -1,0 +1,43 @@
+MARKET,SERIES,SYMBOL,SECURITY,PREVIOUS CLOSE PRICE,OPEN PRICE,HIGH PRICE,LOW PRICE,CLOSE PRICE,NET TRADED VALUE,NET TRADED QTY,TRADES,52 WEEK HIGH,52 WEEK LOW,UNDERLYING
+N,EQ,AXISGOLD,AXIS MF - AXIS GOLD ETF,      2406.05,      2417.00,      2417.00,      2360.00,      2379.30,                   471988.10,198,63,      2806.90,      2323.00,GOLD
+N,EQ,BANKBEES,GOLDMAN SACHS BANKING ETF,      1671.37,      1669.00,      1685.00,      1611.10,      1676.44,                 20431483.06,12341,461,      2098.85,      1536.00,BANK NIFTY
+N,EQ,BSLGOLDETF,BIRLA SL GOLD ETF - GO,      2451.15,      2473.90,      2473.90,      2403.10,      2454.95,                    65626.00,27,10,      2792.00,      2350.00,GOLD
+N,EQ,BSLNIFTY,BIRLA SL NIFTY ETF - GO,        88.00,        85.00,        87.00,        83.50,        85.09,                    25874.65,305,20,       110.67,        65.30,NIFTY
+N,EQ,CPSEETF,GOLDMANAMC - CPSEETF,        20.77,        20.60,        20.79,        20.43,        20.65,                  5474352.67,265384,254,        30.00,        19.77,CPSE INDEX
+N,EQ,CRMFGETF,CAN ROBECO - GOLD ETF,      2510.00,      2495.00,      2500.00,      2490.00,      2490.00,                     9985.00,4,4,      2995.00,      2362.00,GOLD
+N,EQ,GOLDBEES,GOLDMAN SACHS GOLD ETF,      2398.05,      2388.00,      2388.00,      2373.05,      2376.55,                 46865775.85,19710,1459,      2600.00,      2075.00,GOLD
+N,EQ,GOLDSHARE,UTI GOLD ETF,      2396.60,      2388.80,      2399.95,      2330.15,      2343.95,                  5964704.65,2524,371,      3000.00,      2167.00,GOLD
+N,EQ,HDFCMFGETF,HDFC GOLD ETF,      2488.10,      2452.05,      2507.90,      2452.05,      2490.80,                  3672708.95,1478,299,      3003.75,      2351.05,GOLD
+N,EQ,HNGSNGBEES,HANGSENG GOLDMAN SACH ETF,      2250.00,      2249.00,      2249.00,      2249.00,      2249.00,                    17992.00,8,4,      2928.00,      1802.50,HANG SENG INDEX
+N,EQ,ICNX100,ICICIPRAMC - ICCNX100,        87.99,        88.00,        88.00,        87.80,        87.86,                     5543.40,63,10,       109.40,        70.25,CNX 100
+N,EQ,IDBIGOLD,IDBI MF - IDBI GOLD ETF,      2460.00,      2450.00,      2450.00,      2425.50,      2429.15,                    75390.80,31,10,      2731.00,      2333.05,GOLD
+N,EQ,IGOLD,ICICI PRUDENTIAL GOLD ETF,      2418.95,      2424.00,      2424.00,      2372.05,      2393.95,                   133266.05,56,18,      3000.00,      2099.00,GOLD
+N,EQ,INFRABEES,INFRA GOLDMAN SACHS ETF,       290.41,       290.07,       294.97,       290.07,       294.97,                   244861.73,839,13,       377.00,       275.42,CNX INFRASTRUCTURE
+N,EQ,INIFTY,ICICIPRAMC NIFETF,        87.09,        84.00,        87.48,        84.00,        86.26,                    50383.48,589,31,       101.98,        73.04,NIFTY
+N,EQ,JUNIORBEES,NIFTY JR GOLDMAN SACH ETF,       195.12,       195.88,       198.60,       192.00,       195.28,                  1958853.70,10092,270,       218.40,       163.65,JUNIOR NIFTY
+N,EQ,KOTAKBKETF,KOTAKMAMC-KOTAKBKETF,       167.50,       163.55,       168.80,       163.55,       168.03,                  3057343.33,18402,48,       207.00,       159.50,BANK NIFTY
+N,EQ,KOTAKGOLD,KOTAK GOLD ETF,       237.25,       236.75,       236.75,       234.10,       234.40,                  1128114.00,4799,277,      3000.00,       207.00,GOLD
+N,EQ,KOTAKNIFTY,KOTAK NIFTY ETF,       791.14,       783.00,       790.00,       780.05,       786.69,                 21832889.44,27838,201,       963.00,       763.05,NIFTY
+N,EQ,KOTAKPSUBK,KOTAK PSU BANK,       314.83,       302.00,       305.00,       300.00,       302.39,                  7208238.20,23842,83,       449.90,       290.00,CNX PSU BANK INDEX
+N,EQ,LIQUIDBEES,LIQUID GOLDMAN SACHS ETF,      1000.00,      1000.00,      1000.01,       999.99,      1000.00,                557606114.24,557604,2097,      1025.00,       972.00,CALL MONEY SHORT TERM G-SECS & MONEY MARKET INSTR
+N,EQ,M100,MOST SHARES M100 ETF,        13.12,        13.02,        15.10,        12.90,        13.28,                   441583.83,33022,61,        15.14,        10.75,MIDCAP
+N,EQ,M50,MOST SHARES M50 ETF,        74.75,        74.86,        74.86,        73.01,        74.75,                    96098.61,1297,62,       115.80,        71.90,NIFTY
+N,EQ,N100,MOST SHARES N100 ETF,       274.99,       278.88,       284.25,       271.51,       277.83,                   579255.37,2071,125,       306.00,       221.00,NASDAQ100
+N,EQ,NIFTYBEES,NIFTY GOLDMAN SACHS ETF,       789.77,       785.00,       793.80,       778.20,       790.13,                109789219.36,140107,2083,       915.00,       764.12,NIFTY
+N,EQ,NIFTYEES,EDELAMC NIFTYEES,      7725.00,      7725.00,      7725.00,      7725.00,      7725.00,                     7725.00,1,1,      9860.00,      7360.00,NIFTY
+N,EQ,PSUBNKBEES,GOLDMAN SACHS PSU BNK ETF,       334.91,       330.00,       331.80,       324.00,       329.46,                   678637.29,2074,43,       510.00,       319.50,CNX PSU BANK INDEX
+N,EQ,QGOLDHALF,QUANTUM GOLD FUND,      1208.50,      1209.30,      1213.90,      1195.00,      1200.90,                   526675.25,437,236,      1299.00,      1058.80,GOLD
+N,EQ,QNIFTY,QUANTUM INDEX FUND-ETF,       826.20,       813.20,       813.20,       813.20,       813.20,                      813.20,1,1,      1040.00,       802.70,NIFTY
+N,EQ,RELBANK,R SHARES BANKING ETF,      1800.00,      1770.50,      1791.20,      1770.50,      1791.20,                   265704.60,150,4,      2398.00,      1607.00,BANK NIFTY
+N,EQ,RELCNX100,RELCAPAMC - RELCNX100,        79.51,        80.35,        80.35,        80.35,        80.35,                      883.85,11,1,       100.00,        76.80,CNX100
+N,EQ,RELCONS,RELCAPAMC - RELCONS,        35.46,        35.00,        35.00,        35.00,        35.00,                     1750.00,50,1,        41.69,        27.23,CNX CONSUMPTION INDEX
+N,EQ,RELGOLD,R SHARES GOLD ETF,      2319.65,      2300.00,      2314.30,      2275.05,      2277.75,                  2423862.20,1059,237,      2559.00,      2200.00,GOLD
+N,EQ,RELIGAREGO,RELIGARE GOLD ETF,      2449.75,      2439.00,      2439.00,      2400.00,      2414.85,                     7268.70,3,3,      2781.00,      2267.00,GOLD
+N,EQ,RELNIFTY,RELCAPAMC - RELNIFTY,        80.23,        79.39,        80.35,        79.39,        79.97,                     1836.32,23,15,       102.00,        77.00,NIFTY
+N,EQ,SBIGETS,SBI MF-SBI GOLD ETS-GO,      2443.85,      2430.00,      2432.00,      2410.05,      2414.60,                  2246181.55,928,303,      2999.00,      2315.00,GOLD
+N,EQ,SETFBANK,SBIAMC - SETFBANK,       167.10,       165.20,       165.20,       164.45,       164.45,                     4777.05,29,3,       221.00,       140.00,BANK NIFTY
+N,EQ,SETFNIFJR,SBIAMC - SETFNIFJR,       191.25,       192.80,       207.20,       192.60,       195.13,                   205810.10,1021,13,       236.30,       159.00,JUNIOR NIFTY
+N,EQ,SETFNIFTY,SBIAMC - SETFNIFTY,        78.65,        80.00,        83.20,        77.06,        79.55,                   545460.11,6847,82,        88.90,        75.50,NIFTY
+N,EQ,SHARIABEES,SHARIAH GOLDMAN SACHS ETF,       183.45,       180.25,       181.00,       179.50,       180.00,                   100940.25,560,25,       229.55,       165.00,SHARIAH INDEX
+N,EQ,UTINIFTETF,UTIAMC - UTINIFTETF,       778.93,       768.40,       779.00,       768.30,       778.40,                    27044.85,35,10,       786.90,       757.00,NIFTY
+N,EQ,UTISENSETF,UTIAMC - UTISENSETF,       255.25,       253.00,       255.00,       250.57,       254.95,                    84071.91,332,11,       260.00,       250.57,SENSEX
