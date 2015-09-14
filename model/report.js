@@ -85,10 +85,9 @@ var async = require('async')
 		// 				callback()
 		// 			}
 		// }
-		db.portFolioBalances.find({}).sort({date:-1}).limit(1).exec(function(err,result){
-			if(!err && result){
-				console.log("result "+result+" JSON "+JSON.stringify(result))
-				console.log("date "+result[0].closeBal)
+		db.CompanyList.find({"cList.SYMBOL":"AARTIDRUGS"},function(err,companyDetails){
+			if(!err && companyDetails){
+				console.log('companyDetails '+companyDetails+' JSON.stringify '+JSON.stringify(companyDetails))
 			}
 		})
 	}
@@ -381,7 +380,9 @@ var async = require('async')
 					var n = reports.length;
 					function rLoop(j){
 						var report = reports[j];
-						db.CompanyList.findOne({SYMBOL:report.cName},function(err,companyDetails){
+						console.log('cName '+report.cName)
+						db.CompanyList.findOne({"cList.SYMBOL":report.cName},function(err,companyDetails){
+							//console.log('companyDetails '+companyDetails.length)
 							if(!err && companyDetails){
 								var rp = {};
 								rp.cName = report.cName;
@@ -390,10 +391,17 @@ var async = require('async')
 								rp.price = report.price;
 								rp.total = report.total;
 								rp.rMark = report.releaseMark;
-								if(companyDetails.CLOSE !== undefined)
-									cmp = companyDetails.CLOSE;
-								else
-									cmp = 0;
+								console.log('companyDetails length '+companyDetails.cList.length)
+								for(var i = 0 ; i<companyDetails.cList.length ; i++){
+									if(companyDetails.cList[i].SYMBOL === report.cName){
+										if(companyDetails.cList[i].CLOSE !== undefined)
+											cmp = companyDetails.cList[i].CLOSE;
+										else
+											cmp = 0;	
+									}
+									//console.log('companyDetails '+companyDetails.cList[i].SYMBOL)
+								}
+
 								rp.cmp = cmp;
 								console.log(cmp + " --- " + report.quantity + " --- " + report.total)
 								rp.pl = (cmp * report.quantity) - report.total;
