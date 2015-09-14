@@ -85,9 +85,9 @@ var async = require('async')
 		// 				callback()
 		// 			}
 		// }
-		db.CompanyList.find({"cList.SYMBOL":"AARTIDRUGS"},function(err,companyDetails){
-			if(!err && companyDetails){
-				console.log('companyDetails '+companyDetails+' JSON.stringify '+JSON.stringify(companyDetails))
+		db.portFolioBalances.find({ "date": {'$gte': fromDate, '$lte' : toDate}},function(err,result){
+			if(!err && result){
+				console.log('result '+result+' JSON.stringify'+JSON.stringify(result))
 			}
 		})
 	}
@@ -151,6 +151,106 @@ var async = require('async')
 					}
 				})
 			}	
+		})
+	}
+
+	function updatePortfolioBalances(data,callback){
+		var cDate = new Date()
+		var dateString = cDate.toJSON().slice(0, 10)
+
+		db.portFolioBalances.find({pName : data.pName,rTName:data.rTName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
+			if(!err && result.length>0){
+				//console.log('result '+result[0]._id);
+				//var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
+				if(data.cashType === "outflow"){
+					var totalOpenBal = parseFloat(result[0].closeBal) - parseFloat(data.amount);
+				}else{
+					var totalOpenBal = parseFloat(result[0].closeBal) + parseFloat(data.amount);
+				}
+				db.portFolioBalances.update({_id:result[0]._id},{closeBal : totalOpenBal },function(err,updated){
+					if(!err && updated){
+						//console.log('updated success')
+						callback()
+					}
+				})
+			}else{
+				//var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
+				//var finalTotal = total + buyData.buyValue;
+				db.portFolioBalances.find({pName : data.pName,rTName:data.rTName}).sort({date:-1}).limit(1).exec(function(err,docs){
+					if(!err && docs.length>0){
+						console.log('closeBal '+docs[0].closeBal)
+						new db.portFolioBalances({pName : data.pName ,rTName:data.rTName, openBal : docs[0].closeBal, closeBal : docs[0].closeBal, date: new Date()}).save(function(err,inserted){
+							if(!err && inserted){
+								console.log('inserted '+inserted+' JSON '+JSON.stringify(inserted))
+								if(data.cashType === "outflow"){
+									var totalOpenBal = parseFloat(docs[0].closeBal) - parseFloat(data.amount);
+								}else{
+									var totalOpenBal = parseFloat(docs[0].closeBal) + parseFloat(data.amount);
+								}
+								// var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
+								// var totalOpenBal = (parseFloat(Math.round(docs[0].closeBal)).toFixed(2) - total);
+								db.portFolioBalances.update({_id:inserted._id},{closeBal : totalOpenBal },function(err,updated){
+									if(!err && updated){
+										//console.log('updated success')
+										callback()
+									}
+								})
+							}
+						})						
+					}else{
+						db.portFolio.find({pName : data.pName },function(err,amountInfo){
+							if(!err && amountInfo){
+								new db.portFolioBalances({pName : data.pName ,rTName:data.rTName, openBal : amountInfo[0].capital, closeBal : amountInfo[0].capital, date: new Date()}).save(function(err,inserted){
+									if(!err && inserted){
+										if(data.cashType === "outflow"){
+											var totalOpenBal = parseFloat(amountInfo[0].capital) - parseFloat(data.amount);
+										}else{
+											var totalOpenBal = parseFloat(amountInfo[0].capital) + parseFloat(data.amount);
+										}
+								     	db.portFolioBalances.update({_id:inserted._id},{closeBal : totalOpenBal },function(err,updated){
+											if(!err && updated){
+												//console.log('updated success')
+												callback()
+											}
+										})
+										//callback()
+									}
+								})
+							}
+						})
+					}
+				})
+			}	
+		})
+	}
+
+	this.addExtraCash = function(data,callback){
+		var colName = "";
+		data.rTName = "Cash"
+
+    	updatePortfolioBalances(data,function(dividend){
+			console.log('dividend added to balances '+dividend)
+		})
+		if(data.cashType === "dividend"){
+			colName = "portFolioDividend";
+
+		}else if(data.cashType === "inflow"){
+			colName = "portFolioCashInFlow";
+		}else if(data.cashType === "outflow"){
+			colName = "portFolioCashOutFlow";
+		}
+		var cashTypeData = {
+			"pName" : data.pName,
+			"value" : data.amount,
+			"description" : data.description,
+			"date" : new Date()
+		}
+		new db[colName](cashTypeData).save(function(err,cashTypeDataR){
+			if(!err && cashTypeDataR){
+				callback(null,cashTypeDataR)
+			}else{
+				callback("error in saving",{})
+			}
 		})
 	}
 

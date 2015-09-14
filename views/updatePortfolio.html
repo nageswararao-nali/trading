@@ -17,7 +17,8 @@
           var p='<option value="">Select</option>';
           for(var x=0;x < data.length ;x++){
             p+='<option value="'+ data[x].pName +'">'+data[x].pName+'</option>'
-          } 
+          }
+          //alert(p) 
           $("#pName").html(p);    
         })
         $("#buy-form").submit(function(e){
@@ -57,7 +58,7 @@
               <font color='white'>
                   <center><h2></h2></center>
                   <hr>
-                  <input type="hidden" name="pName" id="pName" value="{{portfolio}}">
+                  <input type="hidden" name="portfolio" id="portfolio" value="{{portfolio}}">
                   <input type="hidden" name="rTName" id="rTName" value="{{reportType}}">
                   <div class="form-group">
                     <div class="form-fields">

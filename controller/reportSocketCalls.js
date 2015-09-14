@@ -37,7 +37,15 @@ function reportSocketCalls(report,db,socket){
 			socket.emit('getPL',result);
 		})
 	})
-	
+	socket.on("addExtraCash",function(data){
+		report.addExtraCash(data,function(err,addExtraCashData){
+			if(!err)
+				socket.emit("addExtraCash",addExtraCashData)
+			else
+				console.log("error in saving extra cash details")
+		})
+	})
+		
 	
 	
 	
