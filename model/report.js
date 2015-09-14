@@ -7,11 +7,13 @@ var async = require('async')
 		db.Report.findOne({ 'pName': data.pName, 'cName': data.cName },function(err,doc){
 			if(!err && doc){
 				var quantity = parseInt(doc.quantity) + parseInt(data.quantity);
-				var total = parseInt(doc.total) + (parseInt(data.quantity) * parseInt(data.price))
-				var price = ((parseInt(doc.price) + parseInt(data.price))/2);
+				var currentTotal = parseInt(data.quantity) * parseInt(data.price)
+				currentTotal = parseFloat(Math.round(currentTotal * 100) / 100).toFixed(2);
+				var total = parseFloat(doc.total) + parseFloat(currentTotal)
+				//var price = total / quantity;
 
-				price = parseFloat(Math.round(price * 100) / 100).toFixed(2);
-				var total = parseFloat(Math.round(quantity * price * 100) / 100).toFixed(2);
+				var price = parseFloat(Math.round((total / quantity) * 100) /100).toFixed(2);
+				//var total = parseFloat(Math.round(quantity * price * 100) / 100).toFixed(2);
 				var lastUpdate = new Date();
 				db.Report.update({ 'pName': data.pName, 'cName': data.cName },{$set:{quantity:quantity,price:price,total:total,lastUpdate:lastUpdate}},function(err,docResult){
 					if(!err && docResult)
@@ -52,7 +54,8 @@ var async = require('async')
 			if(!err && result.length>0){
 				console.log('result '+result[0]._id);
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
-				var finalTotal = (total + parseFloat(Math.round(result[0].buyValue)).toFixed(2));
+				var finalTotal = parseFloat(total) + parseFloat(result[0].buyValue);
+				console.log('finalTotal '+finalTotal)
 				db.portFolioBuyInfo.update({_id:result[0]._id},{buyValue : finalTotal },function(err,updated){
 					if(!err && updated){
 						console.log('updated success')
@@ -71,27 +74,63 @@ var async = require('async')
 		})
 	}
 
+	function exFunction(callback){
+		var d = new Date()
+		var yesterday = new Date(new Date() - 24*60*60*1000)
+		var nextday = new Date(yesterday - 24*60*60*1000)
+		//var yesterday = d.setDate(d.getDate() - 1);;
+		//console.log('yesterday date '+nextday+' today '+d)
+		// new db.portFolioBalances({pName : "Nicobar Capital" , openBal : 20000, closeBal : 28000, date: nextday}).save(function(err,inserted){
+		// 			if(!err && inserted){
+		// 				callback()
+		// 			}
+		// }
+		db.portFolioBalances.find({}).sort({date:-1}).limit(1).exec(function(err,result){
+			if(!err && result){
+				console.log("result "+result+" JSON "+JSON.stringify(result))
+				console.log("date "+result[0].closeBal)
+			}
+		})
+	}
+
+	exFunction(function(){
+		console.log('exFunction completed')
+	})
+
 	function addBuyToBalances(data,callback){
 		var cDate = new Date()
 		var dateString = cDate.toJSON().slice(0, 10)
 
 		db.portFolioBalances.find({pName : data.pName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
 			if(!err && result.length>0){
-				console.log('result '+result[0]._id);
+				//console.log('result '+result[0]._id);
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
 				var totalOpenBal = (parseFloat(Math.round(result[0].closeBal)).toFixed(2) - total);
 				db.portFolioBalances.update({_id:result[0]._id},{closeBal : totalOpenBal },function(err,updated){
 					if(!err && updated){
-						console.log('updated success')
+						//console.log('updated success')
 						callback()
 					}
 				})
 			}else{
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
 				//var finalTotal = total + buyData.buyValue;
-				db.portFolioBalances.find({pName : data.pName},function(err,docs){
+				db.portFolioBalances.find({pName : data.pName}).sort({date:-1}).limit(1).exec(function(err,docs){
 					if(!err && docs.length>0){
-						callback()
+						console.log('closeBal '+docs[0].closeBal)
+						new db.portFolioBalances({pName : data.pName , openBal : docs[0].closeBal, closeBal : docs[0].closeBal, date: new Date()}).save(function(err,inserted){
+							if(!err && inserted){
+								console.log('inserted '+inserted+' JSON '+JSON.stringify(inserted))
+								var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
+								var totalOpenBal = (parseFloat(Math.round(docs[0].closeBal)).toFixed(2) - total);
+								db.portFolioBalances.update({_id:inserted._id},{closeBal : totalOpenBal },function(err,updated){
+									if(!err && updated){
+										//console.log('updated success')
+										callback()
+									}
+								})
+							}
+						})						
 					}else{
 						db.portFolio.find({pName : data.pName },function(err,amountInfo){
 							if(!err && amountInfo){
@@ -275,13 +314,17 @@ var async = require('async')
 		})
 	}
 	this.getCompanyList = function(data,callback){
+		console.log('getCompanyList socket called ')
 		var companies = [];
 		if(data.type == "all"){
-			db.CompanyList.find({},{_id:0,SYMBOL:1},function(err,companiesList){
-				if(!err && companiesList){
-					var i=0,n=companiesList.length;
+			db.CompanyList.find({},function(err,companiesList){
+				console.log('companiesList '+companiesList[0].cList.length)
+				if(!err && companiesList.length>0){
+					var i=0,n=companiesList[0].cList.length;
+					console.log('companies list '+n)
+					console.log('company name '+companiesList[0].cList[1].SYMBOL)
 					function cLoop(i){
-						companies.push(companiesList[i].SYMBOL);
+						companies.push(companiesList[0].cList[i].SYMBOL);
 						i++;
 						if(i>=n)
 							callback(companies)

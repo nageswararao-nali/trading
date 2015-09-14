@@ -12,6 +12,7 @@ mongoose.connect('mongodb://localhost/Trading',function(err, db){
 exports.portFolio = mongoose.model('portFolio' , {
       "pName" : String,
       "capital" : Number,
+      "rTName": String,
       "date" : Date
   },"portFolio")
 exports.Company = mongoose.model('Company' , {
@@ -49,6 +50,7 @@ exports.Report = mongoose.model('Report' , {
       "price" : Number,
       "total" : Number,
       "releaseMark" : Number,
+      "rTName": String,
       "createDate" : Date,
       "lastUpdate" : Date
   },"Report")
@@ -58,37 +60,41 @@ exports.RHistory = mongoose.model('RHistory' , {
       "quantity" : Number,
       "price" : Number,
       "buyOrSale" : String,
+      "rTName": String,
       "createDate" : Date
   },"RHistory")
 
 exports.portFolioBuyInfo = mongoose.model('portFolioBuyInfo' , {
       "pName" : String,
       "buyValue" : Number,
+      "rTName": String,
       "date" : Date
   },"portFolioBuyInfo")
 exports.portFolioDividend = mongoose.model('portFolioDividend' , {
       "pName" : String,
       "value" : Number,
       "description" : String,
+      "rTName": String,
       "date" : Date
   },"portFolioDividend")
 exports.portFolioCashInFlow = mongoose.model('portFolioCashInFlow' , {
       "pName" : String,
       "value" : Number,
       "description" : String,
+      "rTName": String,
       "date" : Date
   },"portFolioCashInFlow")
 exports.portFolioCashOutFlow = mongoose.model('portFolioCashOutFlow' , {
       "pName" : String,
       "value" : Number,
       "description" : String,
+      "rTName": String,
       "date" : Date
   },"portFolioCashOutFlow")
 exports.portFolioBalances = mongoose.model('portFolioBalances' , {
       "pName" : String,
       "openBal" : Number,
       "closeBal" : String,
-      "type": String,
+      "rTName": String,
       "date" : Date
   },"portFolioBalances")
-

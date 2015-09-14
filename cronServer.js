@@ -41,7 +41,7 @@ function getUrl(urlCallback){
 			// console.log(content)
 			$ = cheerio.load(content);
 			console.log($(".report").eq(1).find("ul").eq(2).find("li a").attr("href"))
-			var fileUrl = "http://www.nseindia.com/"+$(".report").eq(1).find("ul").eq(2).find("li a").attr("href");
+			var fileUrl = "http://www.nseindia.com/"+$(".report").eq(1).find("ul").eq(3).find("li a").attr("href");
 			urlCallback(fileUrl)
 		}else{
 			console.log("error in request")
