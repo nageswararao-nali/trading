@@ -132,7 +132,7 @@ var async = require('async')
 							}
 						})						
 					}else{
-						db.portFolio.find({pName : data.pName,rTName:data.rTName },function(err,amountInfo){
+						db.portFolio.find({pName : data.pName },function(err,amountInfo){
 							if(!err && amountInfo){
 								new db.portFolioBalances({pName : data.pName ,rTName:data.rTName, openBal : amountInfo[0].capital, closeBal : amountInfo[0].capital, date: new Date()}).save(function(err,inserted){
 									if(!err && inserted){
@@ -255,7 +255,7 @@ var async = require('async')
 			if(!err && result.length>0){
 				//console.log('result '+result[0]._id);
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
-				var totalOpenBal = parseFloat(amountInfo[0].capital) + parseFloat(total);
+				var totalOpenBal = parseFloat(result[0].closeBal) + parseFloat(total);
 				db.portFolioBalances.update({_id:result[0]._id},{closeBal : totalOpenBal },function(err,updated){
 					if(!err && updated){
 						//console.log('updated success')
@@ -272,7 +272,7 @@ var async = require('async')
 							if(!err && inserted){
 								console.log('inserted '+inserted+' JSON '+JSON.stringify(inserted))
 								var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
-								var totalOpenBal = parseFloat(amountInfo[0].capital) + parseFloat(total);
+								var totalOpenBal = parseFloat(docs[0].closeBal) + parseFloat(total);
 								db.portFolioBalances.update({_id:inserted._id},{closeBal : totalOpenBal },function(err,updated){
 									if(!err && updated){
 										//console.log('updated success')
@@ -282,7 +282,7 @@ var async = require('async')
 							}
 						})						
 					}else{
-						db.portFolio.find({pName : data.pName,rTName:data.rTName },function(err,amountInfo){
+						db.portFolio.find({pName : data.pName },function(err,amountInfo){
 							if(!err && amountInfo){
 								new db.portFolioBalances({pName : data.pName ,rTName:data.rTName, openBal : amountInfo[0].capital, closeBal : amountInfo[0].capital, date: new Date()}).save(function(err,inserted){
 									if(!err && inserted){

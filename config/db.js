@@ -12,7 +12,6 @@ mongoose.connect('mongodb://localhost/Trading',function(err, db){
 exports.portFolio = mongoose.model('portFolio' , {
       "pName" : String,
       "capital" : Number,
-      "rTName": String,
       "date" : Date
   },"portFolio")
 exports.Company = mongoose.model('Company' , {
