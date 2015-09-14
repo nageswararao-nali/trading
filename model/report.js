@@ -50,7 +50,7 @@ var async = require('async')
 		var cDate = new Date()
 		var dateString = cDate.toJSON().slice(0, 10)
 
-		db.portFolioBuyInfo.find({pName : data.pName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
+		db.portFolioBuyInfo.find({pName : data.pName,rTName:data.rTName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
 			if(!err && result.length>0){
 				console.log('result '+result[0]._id);
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
@@ -65,7 +65,7 @@ var async = require('async')
 			}else{
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
 				//var finalTotal = total + buyData.buyValue;
-				new db.portFolioBuyInfo({pName : data.pName, buyValue : total, date : new Date()}).save(function(err,saved){
+				new db.portFolioBuyInfo({pName : data.pName,rTName:data.rTName,buyValue : total, date : new Date()}).save(function(err,saved){
 					if(!err && saved){
 						callback()
 					}
@@ -93,15 +93,15 @@ var async = require('async')
 		})
 	}
 
-	exFunction(function(){
-		console.log('exFunction completed')
-	})
+	// exFunction(function(){
+	// 	console.log('exFunction completed')
+	// })
 
 	function addBuyToBalances(data,callback){
 		var cDate = new Date()
 		var dateString = cDate.toJSON().slice(0, 10)
 
-		db.portFolioBalances.find({pName : data.pName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
+		db.portFolioBalances.find({pName : data.pName,rTName:data.rTName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
 			if(!err && result.length>0){
 				//console.log('result '+result[0]._id);
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
@@ -115,10 +115,10 @@ var async = require('async')
 			}else{
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
 				//var finalTotal = total + buyData.buyValue;
-				db.portFolioBalances.find({pName : data.pName}).sort({date:-1}).limit(1).exec(function(err,docs){
+				db.portFolioBalances.find({pName : data.pName,rTName:data.rTName}).sort({date:-1}).limit(1).exec(function(err,docs){
 					if(!err && docs.length>0){
 						console.log('closeBal '+docs[0].closeBal)
-						new db.portFolioBalances({pName : data.pName , openBal : docs[0].closeBal, closeBal : docs[0].closeBal, date: new Date()}).save(function(err,inserted){
+						new db.portFolioBalances({pName : data.pName ,rTName:data.rTName, openBal : docs[0].closeBal, closeBal : docs[0].closeBal, date: new Date()}).save(function(err,inserted){
 							if(!err && inserted){
 								console.log('inserted '+inserted+' JSON '+JSON.stringify(inserted))
 								var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
@@ -132,11 +132,19 @@ var async = require('async')
 							}
 						})						
 					}else{
-						db.portFolio.find({pName : data.pName },function(err,amountInfo){
+						db.portFolio.find({pName : data.pName,rTName:data.rTName },function(err,amountInfo){
 							if(!err && amountInfo){
-								new db.portFolioBalances({pName : data.pName , openBal : amountInfo[0].capital, closeBal : amountInfo[0].capital, date: new Date()}).save(function(err,inserted){
+								new db.portFolioBalances({pName : data.pName ,rTName:data.rTName, openBal : amountInfo[0].capital, closeBal : amountInfo[0].capital, date: new Date()}).save(function(err,inserted){
 									if(!err && inserted){
-										callback()
+										var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
+										var totalOpenBal = (parseFloat(Math.round(amountInfo[0].capital)).toFixed(2) - total);
+										db.portFolioBalances.update({_id:inserted._id},{closeBal : totalOpenBal },function(err,updated){
+											if(!err && updated){
+												//console.log('updated success')
+												callback()
+											}
+										})
+										//callback()
 									}
 								})
 							}
@@ -171,47 +179,155 @@ var async = require('async')
 		// console.log(JSON.stringify(data))
 		// {"pId":"","rTId":"55e7d548bf3390c511fbeaf8","cId":"55e810a7c49b68c812b7f780","quantity":"100","price":"15"}
 
-		
 	}
-	this.sellSharesFromOrg = function(data,callback){
 
-				storeInRHistory(data,'sell');
-				db.Report.findOne({ 'pName': data.pName, 'cName': data.cName},function(err,doc){
-					if(!err && doc){
-					 	var quantity = parseInt(doc.quantity) - parseInt(data.quantity);
-						if(quantity >= 0){
-							/*var price = parseInt(doc.price)+parseInt(data.price);
-							console.log('price -- 1:'+price);
-							price =parseFloat(price / 2) ;
-							console.log('price -- 2:'+price);
-							price = parseFloat(Math.round(price * 100) / 100).toFixed(2);
-							console.log('price -- 3:'+price)*/
-							var total = parseFloat(Math.round(quantity * doc.price * 100) / 100).toFixed(2);
-							// doc.lastUpdate = new Date();
-							console.log('quantity:'+quantity+'\ntotal:'+total)
-							console.log('------------------\n'+JSON.stringify(doc))
-							var releaseMark = doc.releaseMark + ((data.quantity * data.price) - (data.quantity * doc.price))
-							db.Report.update({ '_id':doc._id },{$set:{ 'quantity':quantity ,'total':total ,releaseMark:releaseMark ,'lastUpdate':new Date()}},function(err,docResult){
-								if(!err && docResult){
-									callback({'status':'update success'});
-								}
-								else{
-									console.log('error >>> :'+err);
-									callback({'status':'update fail'})
-								}
-							})
-						}else{
-							console.log('error'+err)
-							callback({'status':'dont have enough share to sell'});
+	function addBasicSellInfo(data,callback){
+		storeInRHistory(data,'sell');
+		db.Report.findOne({ 'pName': data.pName, 'cName': data.cName},function(err,doc){
+			if(!err && doc){
+			 	var quantity = parseInt(doc.quantity) - parseInt(data.quantity);
+				if(quantity >= 0){
+					/*var price = parseInt(doc.price)+parseInt(data.price);
+					console.log('price -- 1:'+price);
+					price =parseFloat(price / 2) ;
+					console.log('price -- 2:'+price);
+					price = parseFloat(Math.round(price * 100) / 100).toFixed(2);
+					console.log('price -- 3:'+price)*/
+					var total = parseFloat(Math.round(quantity * doc.price * 100) / 100).toFixed(2);
+					// doc.lastUpdate = new Date();
+					console.log('quantity:'+quantity+'\ntotal:'+total)
+					console.log('------------------\n'+JSON.stringify(doc))
+					var releaseMark = doc.releaseMark + ((data.quantity * data.price) - (data.quantity * doc.price))
+					db.Report.update({ '_id':doc._id },{$set:{ 'quantity':quantity ,'total':total ,releaseMark:releaseMark ,'lastUpdate':new Date()}},function(err,docResult){
+						if(!err && docResult){
+							callback({'status':'update success'});
 						}
-						
-					}else{
-						console.log('something here >>>>'+err);
-						callback({'status':'dont have enough shares to sell'});
+						else{
+							console.log('error >>> :'+err);
+							callback({'status':'update fail'})
+						}
+					})
+				}else{
+					console.log('error'+err)
+					callback({'status':'dont have enough share to sell'});
+				}
+				
+			}else{
+				console.log('something here >>>>'+err);
+				callback({'status':'dont have enough shares to sell'});
+			}
+		})
+	}
+
+	function addSellToPortfolio(data,callback){
+		var cDate = new Date()
+		var dateString = cDate.toJSON().slice(0, 10)
+
+		db.portFolioSaleInfo.find({pName : data.pName,rTName:data.rTName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
+			if(!err && result.length>0){
+				console.log('result '+result[0]._id);
+				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
+				var finalTotal = parseFloat(total) + parseFloat(result[0].saleValue);
+				console.log('finalTotal '+finalTotal)
+				db.portFolioSaleInfo.update({_id:result[0]._id},{saleValue : finalTotal },function(err,updated){
+					if(!err && updated){
+						console.log('updated success')
+						callback()
 					}
 				})
-	
+			}else{
+				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
+				//var finalTotal = total + buyData.saleValue;
+				new db.portFolioSaleInfo({pName : data.pName,rTName:data.rTName,saleValue : total, date : new Date()}).save(function(err,saved){
+					if(!err && saved){
+						callback()
+					}
+				})
+			}	
+		})
 	}
+
+	function addSellToBalances(data,callback){
+		var cDate = new Date()
+		var dateString = cDate.toJSON().slice(0, 10)
+
+		db.portFolioBalances.find({pName : data.pName,rTName:data.rTName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
+			if(!err && result.length>0){
+				//console.log('result '+result[0]._id);
+				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
+				var totalOpenBal = parseFloat(amountInfo[0].capital) + parseFloat(total);
+				db.portFolioBalances.update({_id:result[0]._id},{closeBal : totalOpenBal },function(err,updated){
+					if(!err && updated){
+						//console.log('updated success')
+						callback()
+					}
+				})
+			}else{
+				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
+				//var finalTotal = total + buyData.buyValue;
+				db.portFolioBalances.find({pName : data.pName,rTName:data.rTName}).sort({date:-1}).limit(1).exec(function(err,docs){
+					if(!err && docs.length>0){
+						console.log('closeBal '+docs[0].closeBal)
+						new db.portFolioBalances({pName : data.pName ,rTName:data.rTName, openBal : docs[0].closeBal, closeBal : docs[0].closeBal, date: new Date()}).save(function(err,inserted){
+							if(!err && inserted){
+								console.log('inserted '+inserted+' JSON '+JSON.stringify(inserted))
+								var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
+								var totalOpenBal = parseFloat(amountInfo[0].capital) + parseFloat(total);
+								db.portFolioBalances.update({_id:inserted._id},{closeBal : totalOpenBal },function(err,updated){
+									if(!err && updated){
+										//console.log('updated success')
+										callback()
+									}
+								})
+							}
+						})						
+					}else{
+						db.portFolio.find({pName : data.pName,rTName:data.rTName },function(err,amountInfo){
+							if(!err && amountInfo){
+								new db.portFolioBalances({pName : data.pName ,rTName:data.rTName, openBal : amountInfo[0].capital, closeBal : amountInfo[0].capital, date: new Date()}).save(function(err,inserted){
+									if(!err && inserted){
+										var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
+										var totalOpenBal = parseFloat(amountInfo[0].capital) + parseFloat(total);
+										db.portFolioBalances.update({_id:inserted._id},{closeBal : totalOpenBal },function(err,updated){
+											if(!err && updated){
+												//console.log('updated success')
+												callback()
+											}
+										})
+										//callback()
+									}
+								})
+							}
+						})
+					}
+				})
+			}	
+		})
+	}
+
+	this.sellSharesFromOrg = function(data,maincallback){
+		async.parallel([
+			function(callback1){
+				addBasicSellInfo(data,function(result){
+					status = result;
+					callback1()
+				})
+		    },function(callback1){
+		    	addSellToPortfolio(data,function(info){
+		    		callback1()
+		    	})
+			},function(callback1){
+		    	addSellToBalances(data,function(info){
+		    		callback1()
+		    	})
+			}],
+			function(err,result){
+				maincallback(status)
+				console.log('buy success '+status)
+			}
+		)	
+	}
+
 	function getPortfolioById(pId,callback){
 		db.portFolio.findOne({ '_id' : pId },{'__v':0,'createDate':0}).exec(function(err,pData){
 			if(!err && pData){

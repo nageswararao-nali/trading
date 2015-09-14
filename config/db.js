@@ -70,6 +70,14 @@ exports.portFolioBuyInfo = mongoose.model('portFolioBuyInfo' , {
       "rTName": String,
       "date" : Date
   },"portFolioBuyInfo")
+
+exports.portFolioSaleInfo = mongoose.model('portFolioSaleInfo' , {
+      "pName" : String,
+      "saleValue" : Number,
+      "rTName": String,
+      "date" : Date
+  },"portFolioSaleInfo")
+
 exports.portFolioDividend = mongoose.model('portFolioDividend' , {
       "pName" : String,
       "value" : Number,
