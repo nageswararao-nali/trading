@@ -605,7 +605,7 @@ var async = require('async')
 							purchases += parseInt(rData);
 							getBuyDataByRT("Mutual Funds",function(rData){
 								purchases += parseInt(rData);
-								sCallback(calcPL)
+								sCallback(getDivInOut)
 							})
 						})
 					})
@@ -613,13 +613,43 @@ var async = require('async')
 			}else{
 				getBuyDataByRT(rTName,function(rData){
 					purchases = parseInt(rData);
-					sCallback(calcPL)
+					sCallback(getDivInOut)
 				})
 			}
 		}
+		function getDivInOutVal(dbName,dioCallback){
+			db[dbName].find({date:{$gte:from,$lt:to},pName:pName})
+			.sort({date:1})
+			.exec(function(err,rows){
+				var tot = 0;
+				if(!err && rows.length){
+					for(var i=0;i<rows.length;i++){
+						tot += parseInt(rows[i].value);
+						console.log(i + " ==== " + rows.length)
+						if(i >= rows.length - 1)
+							dioCallback(tot)
+					}
+				}else{
+					console.log(" something happening " + err + " === " + rows)
+					dioCallback(tot)
+				}
+			})
+		}
+		function getDivInOut(){
+			getDivInOutVal("portFolioDividend",function(rData){
+				dividend = rData;
+				getDivInOutVal("portFolioCashInFlow",function(rData){
+					inflow = rData;
+					getDivInOutVal("portFolioCashOutFlow",function(rData){
+						outflow = rData;
+						calcPL();
+					})
+				})
+			})
+		}
 		function calcPL(){
-			var PL = parseInt(closingValue) + parseInt(cash) + parseInt(purchases) - parseInt(sales) - parseInt(openingValue);
-			console.log(parseInt(closingValue) + " == " + parseInt(cash) + " == " + parseInt(purchases) + " == " + parseInt(sales) + " == " + parseInt(openingValue));
+			var PL = parseInt(closingValue) + parseInt(cash) + parseInt(purchases) - parseInt(sales) - parseInt(openingValue) + parseInt(dividend) + parseInt(outflow) - parseInt(inflow);
+			// console.log(parseInt(closingValue) + " == " + parseInt(cash) + " == " + parseInt(purchases) + " == " + parseInt(sales) + " == " + parseInt(openingValue));
 			
 			console.log(" Profit / Loss value is ----------");
 			console.log(" ********************************************* ")
@@ -690,7 +720,7 @@ var async = require('async')
 			getDataByRT("Cash",function(rData){
 				/*closingValue += rData.closeBal;
 				openingValue += rData.openBal;*/
-				cash = parseInt(rData.closeBal);
+				cash = parseInt(rData.closeBal) - parseInt(rData.openBal);
 				getPurchases(getSales)
 			})
 		}
@@ -732,7 +762,10 @@ var async = require('async')
 					console.log(" ************************************* ")
 					var rData = {};
 					rData.openBal = rows[0].closeBal;
-					rData.closeBal = rows[rows.length-1].openBal;
+					if(rows.length > 1)
+						rData.closeBal = rows[rows.length-1].openBal;
+					else
+						rData.closeBal = rows[0].closeBal;
 					rTcallback(rData)
 				}else if(err){
 					console.log("error in getting data " + err)

@@ -12,6 +12,7 @@
     <script>
       var socket = io.connect();
       $(document).ready(function(){
+        $(".reportStyle").hide();
         $("#fDate" ).datepicker();
         $("#toDate" ).datepicker();
         $("#buy-form").submit(function(e){
@@ -22,7 +23,8 @@
           var to = $("#toDate").val();
           socket.emit('getPL',{rTName:rTName,pName:pName,from:from,to:to})
           socket.on('getPL',function(PLData){
-            $("#PLData").html(PLData.pl)
+            $(".reportStyle").show();
+            $("#PLData").html(" <b> Profit / Loss : "+PLData.pl + "</b> ")
           })
         })
       })
@@ -77,13 +79,25 @@
                     </div>
                   </div>
                   <center>
-                    <input type="submit" value="Buy" class="button" id='buy'>
+                    <input type="submit" value="Submit" class="button" id='buy'>
                   </center>
                   <hr>
               </font> 
             </form>
           </div>
-          <div id="PLData"></div>
+          <div>
+            <center>
+              <font color='white'>
+                <div class="reportStyle">
+                  <b>*  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *</b>
+                </div>
+                <span id="PLData"></span>
+                <div class="reportStyle">
+                  <b>* * * * * * * * * * * * * * * * * * * * *</b>
+                </div>
+              </font>
+            </center>
+          </div>
         </div>
       </div>
     </section>
