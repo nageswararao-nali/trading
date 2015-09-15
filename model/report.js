@@ -761,16 +761,13 @@ var async = require('async')
 					console.log(rows)
 					console.log(" ************************************* ")
 					var rData = {};
-					//rData.openBal = rows[0].closeBal;
-					if(rows.length > 1)
-						rData.openBal = rows[0].closeBal;
-					else
-						rData.openBal = rows[rows.length-1].openBal;
-
-					if(rows.length > 1)
-						rData.closeBal = rows[rows.length-1].openBal;
-					else
+					if(rows.length == 1){
+						rData.openBal = rows[0].openBal;
 						rData.closeBal = rows[0].closeBal;
+					}else{
+						rData.openBal = rows[0].openBal;
+						rData.closeBal = rows[rows.length-1].closeBal;
+					}
 					rTcallback(rData)
 				}else if(err){
 					console.log("error in getting data " + err)
