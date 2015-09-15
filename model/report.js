@@ -732,7 +732,10 @@ var async = require('async')
 					console.log(" ************************************* ")
 					var rData = {};
 					rData.openBal = rows[0].closeBal;
-					rData.closeBal = rows[rows.length-1].openBal;
+					if(rows.length > 1)
+						rData.closeBal = rows[rows.length-1].openBal;
+					else
+						rData.closeBal = rows[rows.length-1].closeBal;
 					rTcallback(rData)
 				}else if(err){
 					console.log("error in getting data " + err)
