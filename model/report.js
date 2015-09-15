@@ -649,7 +649,7 @@ var async = require('async')
 		}
 		function calcPL(){
 			var PL = parseInt(closingValue) + parseInt(cash) + parseInt(purchases) - parseInt(sales) - parseInt(openingValue) + parseInt(dividend) + parseInt(outflow) - parseInt(inflow);
-			// console.log(parseInt(closingValue) + " == " + parseInt(cash) + " == " + parseInt(purchases) + " == " + parseInt(sales) + " == " + parseInt(openingValue));
+			 console.log(parseInt(closingValue) + " == " + parseInt(cash) + " == " + parseInt(purchases) + " == " + parseInt(sales) + " == " + parseInt(openingValue) + " == " + parseInt(dividend) + " == " + parseInt(outflow) + " == " +parseInt(inflow));
 			
 			console.log(" Profit / Loss value is ----------");
 			console.log(" ********************************************* ")
@@ -761,7 +761,12 @@ var async = require('async')
 					console.log(rows)
 					console.log(" ************************************* ")
 					var rData = {};
-					rData.openBal = rows[0].closeBal;
+					//rData.openBal = rows[0].closeBal;
+					if(rows.length > 1)
+						rData.openBal = rows[0].closeBal;
+					else
+						rData.openBal = rows[rows.length-1].openBal;
+
 					if(rows.length > 1)
 						rData.closeBal = rows[rows.length-1].openBal;
 					else
