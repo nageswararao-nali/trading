@@ -648,7 +648,7 @@ var async = require('async')
 			})
 		}
 		function calcPL(){
-			var PL = parseInt(closingValue) + parseInt(cash) + parseInt(purchases) - parseInt(sales) - parseInt(openingValue) + parseInt(dividend) + parseInt(outflow) - parseInt(inflow);
+			var PL = parseInt(closingValue) + parseInt(cash) + parseInt(purchases) - parseInt(sales) - parseInt(openingValue);// + parseInt(dividend) + parseInt(outflow) - parseInt(inflow);
 			 console.log(parseInt(closingValue) + " == " + parseInt(cash) + " == " + parseInt(purchases) + " == " + parseInt(sales) + " == " + parseInt(openingValue) + " == " + parseInt(dividend) + " == " + parseInt(outflow) + " == " +parseInt(inflow));
 			
 			console.log(" Profit / Loss value is ----------");
