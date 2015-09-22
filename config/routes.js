@@ -20,12 +20,12 @@ module.exports = function(app,db){
 		var password = req.body.password;
 		if(userName == "admin" && password == "pass"){
 			req.session.isUserLoggedIn = true;
-			res.redirect("/dashboard")
+			res.redirect("/buy")
 		}
 		else
 			res.render("adminLogin.html",{"status":"Invalid username/passowrd"})
 	});
-	app.post('/savereportDetails',function(req,res){
+	/*app.post('/savereportDetails',function(req,res){
 		var portfolio = req.body.portfolio;
 		var reportType = req.body.reportType;
 		var reportDetails = {
@@ -34,47 +34,32 @@ module.exports = function(app,db){
 		};
 		req.session.reportDetails = reportDetails;
 		res.redirect("/buy")
-	});
+	});*/
 	app.get('/buy',function(req,res){
 		if(req.session.isUserLoggedIn){
-			var reportDetails = req.session.reportDetails;
-			if(reportDetails === undefined){
-				res.redirect("/dashboard")
-			}else{
-      			res.render("buy.html",{activeMenu:"buy",activeTab:"",portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
-			}
+			res.render("buy.html",{activeMenu:"buy",activeTab:""});
 		}else{
       		res.render("adminLogin.html");
 		}
 	});
 	app.get('/sale',function(req,res){
 		if(req.session.isUserLoggedIn){
-      		var reportDetails = req.session.reportDetails;
-      		if(reportDetails === undefined){
-				res.redirect("/dashboard")
-			}else{
-      			res.render("sale.html",{activeMenu:"sale",activeTab:"",portfolio:reportDetails.portfolio,reportType:reportDetails.reportType});
-			}
+  			res.render("sale.html",{activeMenu:"sale",activeTab:""});
 		}else{
       		res.render("adminLogin.html");
 		}
 	});
 	app.get('/reports/:reportType',function(req,res){
 		if(req.session.isUserLoggedIn){
-      		var reportDetails = req.session.reportDetails;
-      		if(reportDetails === undefined){
-				res.redirect("/dashboard")
-			}else{
-				var reportPage = req.param("reportType");
-      			res.render(reportPage+".html",{portfolio:reportDetails.portfolio,reportType:reportDetails.reportType,activeMenu:"report",activeTab:reportPage});
-			}
+      		var reportPage = req.param("reportType");
+  			res.render(reportPage+".html",{activeMenu:"report",activeTab:reportPage});
 		}else{
       		res.render("adminLogin.html");
 		}
 	});
 	app.get('/dashboard',function(req,res){
 		if(req.session.isUserLoggedIn){
-      		res.render("dashboard.html",{activeMenu:"home",activeTab:""});
+      		res.render("buy.html",{activeMenu:"home",activeTab:""});
 		}else{
       		res.render("adminLogin.html");
 		}

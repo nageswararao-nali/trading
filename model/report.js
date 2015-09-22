@@ -244,7 +244,6 @@ var async = require('async')
 		var cashTypeData = {
 			"pName" : data.pName,
 			"value" : data.amount,
-			"description" : data.description,
 			"date" : new Date()
 		}
 		new db[colName](cashTypeData).save(function(err,cashTypeDataR){
@@ -582,12 +581,12 @@ var async = require('async')
 				}
 			})
 		}else{
-			db.Report.find({"pDetails.pId":data.pId},{_id:0,"cDetails.cName":1},function(err,companiesList){
+			db.Report.find({"pName":data.pName},{_id:0,cName:1},function(err,companiesList){
 				if(!err && companiesList){
 					console.log(companiesList)
 					var i=0,n=companiesList.length;
 					function cLoop(i){
-						companies.push(companiesList[i].cDetails.cName);
+						companies.push(companiesList[i].cName);
 						i++;
 						if(i>=n)
 							callback(companies)
