@@ -228,15 +228,17 @@ var async = require('async')
 		var colName = "";
 		data.rTName = "Cash"
 
-    	updatePortfolioBalances(data,function(dividend){
-			console.log('dividend added to balances '+dividend)
-		})
+  //   	updatePortfolioBalances(data,function(dividend){
+		// 	console.log('dividend added to balances '+dividend)
+		// })
 		if(data.cashType === "dividend"){
+			  addChangesToCash(data.pName,data.amount,"add",function(info){})
 			colName = "portFolioDividend";
-
 		}else if(data.cashType === "inflow"){
+			addChangesToCash(data.pName,data.amount,"add",function(info){})
 			colName = "portFolioCashInFlow";
 		}else if(data.cashType === "outflow"){
+    		addChangesToCash(data.pName,data.amount,"subtract",function(info){})
 			colName = "portFolioCashOutFlow";
 		}
 		var cashTypeData = {
@@ -254,6 +256,22 @@ var async = require('async')
 		})
 	}
 
+	function addChangesToCash(pName,amount,type,callback){
+		var updateQuery = {}
+		if(type == "subtract"){
+			updateQuery.capital = -amount;
+		}else{
+			updateQuery.capital = amount
+		}
+		db.portFolio.update({pName : pName},{$inc : updateQuery},function(err,updated){
+			if(!err && updated){
+				callback()
+			}
+		})
+		
+		//console.log('data '+data+' stringify '+JSON.stringify(data))
+	}
+
 	this.buySharesFromOrg = function(data,maincallback){
 		async.parallel([
 			function(callback1){
@@ -266,7 +284,9 @@ var async = require('async')
 		    		callback1()
 		    	})
 			},function(callback1){
-		    	addBuyToBalances(data,function(info){
+				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
+
+		    	addChangesToCash(data.pName,total,"subtract",function(info){
 		    		callback1()
 		    	})
 			}],
@@ -416,7 +436,8 @@ var async = require('async')
 		    		callback1()
 		    	})
 			},function(callback1){
-		    	addSellToBalances(data,function(info){
+				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
+		    	addChangesToCash(data.pName,total,"add",function(info){
 		    		callback1()
 		    	})
 			}],
