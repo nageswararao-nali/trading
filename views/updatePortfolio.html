@@ -26,8 +26,7 @@
           var data = {
             pName : $("#pName").val(),
             cashType : $("#cashType").val(),
-            amount : $("#amount").val(),
-            description : $("#description").val()
+            amount : $("#amount").val()
           }
           console.log('buy data '+data+' stringify '+JSON.stringify(data))
           socket.emit('addExtraCash',data)
@@ -101,18 +100,6 @@
                     <div class="form-fields">
                       <span  class="form-field">
                         <input type="text" name="amount" id="amount">
-                      </span>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <div class="form-fields">
-                      <span class="form-label">
-                        <label><b>Description :</b></label>
-                      </span>
-                    </div>
-                    <div class="form-fields">
-                      <span  class="form-field">
-                        <input type="text" name="description" id="description">
                       </span>
                     </div>
                   </div>

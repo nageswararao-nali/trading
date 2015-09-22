@@ -12,21 +12,39 @@
     <script>
       var socket = io.connect();
       $(document).ready(function(){
-        socket.emit('getCompanies','hi')
+        socket.emit('getPortfolio','hi')
+        socket.on('getPortfolio',function(data){
+          console.log(data)
+          var p='';
+          for(var x=0;x < data.length ;x++){
+            p+='<option value="'+ data[x].pName +'">'+data[x].pName+'</option>'
+          } 
+          $("#pName").html(p);    
+        })
+        socket.emit('ReportType','hi')
+        socket.on('ReportType',function(data){
+          var p='<option value="all">All</option>';
+          for(var x=0;x < data.length ;x++){
+            p+='<option value="'+ data[x].rTName +'">'+data[x].rTName+'</option>'
+          } 
+          $("#rTName").html(p);    
+        })
+        /*socket.emit('getCompanies','hi')
         socket.on('getCompanies',function(data){
           var p='<option value="">Select</option>';
           for(var x=0;x < data.length ;x++){
             p+='<option value="'+ data[x]._id +'">'+data[x].cName+'</option>'
           } 
           $("#cId").html(p);    
-        })
+        })*/
         var rTName = $("#rTName").val();
         var pName = $("#pName").val();
         var type = "all"
-        if(rTName == "55ed417c0f3a77fe136cac9b"){
+        if(rTName !== "all"){
           type = "portfolio";
         }else{
         }
+
         socket.emit('getCompanyList',{rTName:rTName,pName:pName,type:type})
         socket.on('getCompanyList',function(companies){
           var companylist = companies;
@@ -85,8 +103,34 @@
               <font color='white'>
                   <center><h2>Sale</h2></center>
                   <hr>
-                  <input type="hidden" name="pName" id="pName" value="{{portfolio}}">
-                  <input type="hidden" name="rTName" id="rTName" value="{{reportType}}">
+                  <div class="form-group">
+                    <div class="form-fields">
+                      <span class="form-label">
+                        <label><b>Portfolio :</b></label>
+                      </span>
+                    </div>
+                    <div class="form-fields">
+                      <span  class="form-field">
+                        <select name="pName" id="pName">
+                          <option value="">--select--</option>
+                        </select>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-fields">
+                      <span class="form-label">
+                        <label><b>Report Type :</b></label>
+                      </span>
+                    </div>
+                    <div class="form-fields">
+                      <span  class="form-field">
+                        <select name="rTName" id="rTName">
+                          <option value="">--select--</option>
+                        </select>
+                      </span>
+                    </div>
+                  </div>
                   <div class="form-group">
                     <div class="form-fields">
                       <span class="form-label">
@@ -95,9 +139,6 @@
                     </div>
                     <div class="form-fields">
                       <span  class="form-field">
-                        <!-- <select name="cId" id="cId">
-                          <option value="">--select--</option>
-                        </select> -->
                         <input type="text" name="cName" id="cName">
                       </span>
                     </div>
