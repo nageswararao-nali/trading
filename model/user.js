@@ -6,6 +6,23 @@ function userModule(db){
 			if(!err && info.length>0){
 				callback({status:"this Portfolio name already exists"})
 			}else{
+				var pDetails = {pName:selectQuery.pName, capital:selectQuery.capital, date : new Date()}
+				new db.portFolio(pDetails).save(function(err,saved){
+					if(!err && saved){
+						callback({status:"new Portfolio added successfully"})
+					}else{
+						callback({status:"problem in adding portfolio"})
+					}
+				})
+			}
+		})
+
+	}
+	this.addPortfolioOld = function(selectQuery,callback){
+		db.portFolio.find({pName:selectQuery.pName},function(err,info){
+			if(!err && info.length>0){
+				callback({status:"this Portfolio name already exists"})
+			}else{
 				console.log(selectQuery)
 				var pDetails = {pName:selectQuery.pName, capital:selectQuery.capital, date : new Date()}
 				new db.portFolio(pDetails).save(function(err,saved){

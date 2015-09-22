@@ -17,11 +17,11 @@
           e.preventDefault();
           var data = {
             pName : $("#pName").val(),
-            capital : $("#capital").val(),
+            capital : $("#capital").val()/*,
             equity : $("#equity").val(),
             futures : $("#futures").val(),
             commodity : $("#commodity").val(),
-            mutualfunds : $("#mutualfunds").val()
+            mutualfunds : $("#mutualfunds").val()*/
 
           }
           socket.emit('addPortfolio',data)
@@ -79,7 +79,7 @@
                       </span>
                     </div>
                   </div>
-                  <center><p> <b>Open Balances</b> </p></center>
+                  <!-- <center><p> <b>Open Balances</b> </p></center>
                   <div class="form-group">
                     <div class="form-fields">
                       <span class="form-label">
@@ -127,7 +127,7 @@
                         <input type="text" name="mutualfunds" id="mutualfunds">
                       </span>
                     </div>
-                  </div>
+                  </div> -->
                   <center>
                     <input type="submit" value="Create" class="button" id='Create'>
                   </center>

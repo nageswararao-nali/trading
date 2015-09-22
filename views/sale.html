@@ -23,7 +23,7 @@
         })
         socket.emit('ReportType','hi')
         socket.on('ReportType',function(data){
-          var p='<option value="all">All</option>';
+          var p='';
           for(var x=0;x < data.length ;x++){
             p+='<option value="'+ data[x].rTName +'">'+data[x].rTName+'</option>'
           } 
@@ -40,7 +40,7 @@
         var rTName = $("#rTName").val();
         var pName = $("#pName").val();
         var type = "all"
-        if(rTName !== "all"){
+        if(rTName !== "futures"){
           type = "portfolio";
         }else{
         }
