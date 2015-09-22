@@ -49,17 +49,17 @@ function getUrl(urlCallback){
 		}
 	})
 }
-getUrl(function(dZipFilePath){
-	var dZipFileName = dZipFilePath.split("/").pop();
-	var dPath = "assets/files/"+dZipFileName;
-	request.get({uri:dZipFilePath,headers:headers}).pipe(fs.createWriteStream(dPath))
-	setTimeout(function(){
-		fs.createReadStream(dPath).pipe(unzip.Extract({ path: 'assets/ofiles/' }));
-		setTimeout(function(){
-			parseCsvFile('assets/ofiles/'+dZipFileName)
-		},2000)
-	},5000)
-})
+// getUrl(function(dZipFilePath){
+// 	var dZipFileName = dZipFilePath.split("/").pop();
+// 	var dPath = "assets/files/"+dZipFileName;
+// 	request.get({uri:dZipFilePath,headers:headers}).pipe(fs.createWriteStream(dPath))
+// 	setTimeout(function(){
+// 		fs.createReadStream(dPath).pipe(unzip.Extract({ path: 'assets/ofiles/' }));
+// 		setTimeout(function(){
+// 			parseCsvFile('assets/ofiles/'+dZipFileName)
+// 		},2000)
+// 	},5000)
+// })
 function parseCsvFile(csvFilePath){
 	// var inputFile='assets/ofiles/cm03SEP2015bhav.csv';
 	var filepath = csvFilePath.split(".");
@@ -147,3 +147,168 @@ function parseCsvFile(csvFilePath){
 	})
 	fs.createReadStream(inputFile).pipe(parser);
 }
+
+function getCurrentCash(pName,callback){
+	db.portFolio.find({pName : pName },function(err,amountInfo){
+		if(!err && amountInfo){
+			callback(amountInfo[0].capital)
+		}
+	})
+}
+
+function getSharesValue(pName,date,callback){
+	var query = {"pName" : pName}
+	var dateString = date.toJSON().slice(0, 10)
+	var status = {}
+	var alltotal = 0
+	db.Report.find(query).exec(function(err,reports){
+		if(!err && reports.length){
+			var j=0;var reportsCon =[];
+			var n = reports.length;
+			function rLoop(j){
+				var report = reports[j];
+				console.log('cName '+report.cName)
+				db.CompanyList.findOne({'$where': 'this.createDate.toJSON().slice(0, 10) == "'+dateString+'"',"cList.SYMBOL":report.cName},function(err,companyDetails){
+					//console.log('companyDetails '+companyDetails.length)
+					if(!err && companyDetails){
+						var rp = {};
+						// rp.cName = report.cName;
+						// rp.pName = report.pName;
+						// rp.quantity = report.quantity;
+						// rp.price = report.price;
+						// rp.total = report.total;
+						// rp.rMark = report.releaseMark;
+						console.log('companyDetails length '+companyDetails.cList.length)
+						for(var i = 0 ; i<companyDetails.cList.length ; i++){
+							if(companyDetails.cList[i].SYMBOL === report.cName){
+								if(companyDetails.cList[i].CLOSE !== undefined)
+									cmp = companyDetails.cList[i].CLOSE;
+								else
+									cmp = 0;	
+							}
+							//console.log('companyDetails '+companyDetails.cList[i].SYMBOL)
+						}
+						console.log('cmp '+cmp+' cName '+report.cName+' and quantity '+report.quantity)
+
+
+						// rp.cmp = cmp;
+						// console.log(cmp + " --- " + report.quantity + " --- " + report.total)
+						// rp.pl = (cmp * report.quantity) - report.total;
+						var total = parseFloat(Math.round(report.quantity * cmp * 100) / 100).toFixed(2);
+						console.log('total '+total)
+						alltotal += parseFloat(total);
+						console.log('alltotal '+alltotal)
+						
+						
+						j++;
+						if(j>=n){
+							status.msg = "success"
+							status.alltotal = alltotal
+							callback(status)
+						}else{
+							rLoop(j)
+						}
+					}else{
+						j++;
+						if(j>=n){
+							status.msg = "inconvenient data in CompanyList"
+							status.alltotal = alltotal
+							callback(status)
+						}else{
+							rLoop(j)
+						}
+					}
+				})
+			}rLoop(j)
+		}else{
+			console.log("no reports found")
+			status.msg = "no records found"
+			callback(status)
+		}
+	})
+}
+
+	function updateToBalances(pName,date,rTName,closingBalance,callback){
+		//var cDate = new Date()
+		var dateString = date.toJSON().slice(0, 10)
+
+		db.portFolioBalances.find({pName : pName,rTName:rTName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
+			if(!err && result.length>0){
+				db.portFolioBalances.update({_id:result[0]._id},{closeBal : closingBalance },function(err,updated){
+					if(!err && updated){
+						//console.log('updated success')
+						callback()
+					}
+				})
+			}else{
+				db.portFolioBalances.find({pName : pName,rTName:rTName}).sort({date:-1}).limit(1).exec(function(err,docs){
+					if(!err && docs.length>0){
+						console.log('closeBal '+docs[0].closeBal)
+						new db.portFolioBalances({pName : pName ,rTName:rTName, openBal : docs[0].closeBal, closeBal : docs[0].closeBal, date: date}).save(function(err,inserted){
+							if(!err && inserted){
+								db.portFolioBalances.update({_id:inserted._id},{closeBal : closingBalance },function(err,updated){
+									if(!err && updated){
+										//console.log('updated success')
+										callback()
+									}
+								})
+							}
+						})						
+					}else{
+						db.portFolio.find({pName : pName },function(err,amountInfo){
+							if(!err && amountInfo){
+								new db.portFolioBalances({pName : pName ,rTName:rTName, openBal : amountInfo[0].capital, closeBal : amountInfo[0].capital, date: date}).save(function(err,inserted){
+									if(!err && inserted){
+										db.portFolioBalances.update({_id:inserted._id},{closeBal : closingBalance },function(err,updated){
+											if(!err && updated){
+												//console.log('updated success')
+												callback()
+											}
+										})
+										//callback()
+									}
+								})
+							}
+						})
+					}
+				})
+			}	
+		})
+	}
+
+function updateClosingBalance(pName,date,rTName,maincallback){
+	//process : every day evening execute this function
+	// closingBalance = cash + (shares of all companies in portfolio * cmp of that day)
+	var cash,sharesValue;
+	async.parallel([
+		function(callback1){
+			getCurrentCash(pName,function(result){
+				cash = result
+				callback1()
+			})
+	    },function(callback1){
+	    	getSharesValue(pName,date,function(status){
+	    		console.log('sharesValue at function async '+status.alltotal)
+	    		sharesValue = status.alltotal
+	    		msg = status.msg
+	    		callback1()
+	    	})
+		}],
+		function(err,result){
+			console.log('cash '+cash+' and sharesValue '+sharesValue)
+			var closingBalance = parseFloat(cash) + parseFloat(sharesValue);
+			var dateString = date.toJSON().slice(0,10);
+			
+			updateToBalances(pName,date,rTName,closingBalance,function(result){
+				maincallback(closingBalance,msg)
+			})
+
+		}
+	)
+}
+
+var yesterday = new Date(new Date() - 24*60*60*1000*11)
+console.log('yesterday '+yesterday)
+updateClosingBalance("Nicobar Capital",yesterday,"Equity",function(closingBalance,msg){
+	console.log('status of updateClosingBalance is '+closingBalance+' message '+msg)
+})
