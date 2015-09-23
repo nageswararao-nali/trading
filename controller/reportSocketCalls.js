@@ -45,12 +45,5 @@ function reportSocketCalls(report,db,socket){
 				console.log("error in saving extra cash details")
 		})
 	})
-		
-	
-	
-	
-
-
-	
 }
 module.exports.reportSocketCalls = reportSocketCalls;

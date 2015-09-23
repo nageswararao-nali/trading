@@ -50,7 +50,7 @@ var async = require('async')
 		var cDate = new Date()
 		var dateString = cDate.toJSON().slice(0, 10)
 
-		db.portFolioBuyInfo.find({pName : data.pName,rTName:data.rTName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
+		db.portFolioBuyInfo.find({pName : data.pName,segment:data.segment,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
 			if(!err && result.length>0){
 				console.log('result '+result[0]._id);
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
@@ -65,7 +65,7 @@ var async = require('async')
 			}else{
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
 				//var finalTotal = total + buyData.buyValue;
-				new db.portFolioBuyInfo({pName : data.pName,rTName:data.rTName,buyValue : total, date : new Date()}).save(function(err,saved){
+				new db.portFolioBuyInfo({pName : data.pName,segment:data.segment,buyValue : total, date : new Date()}).save(function(err,saved){
 					if(!err && saved){
 						callback()
 					}
@@ -100,7 +100,7 @@ var async = require('async')
 		var cDate = new Date()
 		var dateString = cDate.toJSON().slice(0, 10)
 
-		db.portFolioBalances.find({pName : data.pName,rTName:data.rTName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
+		db.portFolioBalances.find({pName : data.pName,segment:data.segment,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
 			if(!err && result.length>0){
 				//console.log('result '+result[0]._id);
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
@@ -114,10 +114,10 @@ var async = require('async')
 			}else{
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
 				//var finalTotal = total + buyData.buyValue;
-				db.portFolioBalances.find({pName : data.pName,rTName:data.rTName}).sort({date:-1}).limit(1).exec(function(err,docs){
+				db.portFolioBalances.find({pName : data.pName,segment:data.segment}).sort({date:-1}).limit(1).exec(function(err,docs){
 					if(!err && docs.length>0){
 						console.log('closeBal '+docs[0].closeBal)
-						new db.portFolioBalances({pName : data.pName ,rTName:data.rTName, openBal : docs[0].closeBal, closeBal : docs[0].closeBal, date: new Date()}).save(function(err,inserted){
+						new db.portFolioBalances({pName : data.pName ,segment:data.segment, openBal : docs[0].closeBal, closeBal : docs[0].closeBal, date: new Date()}).save(function(err,inserted){
 							if(!err && inserted){
 								console.log('inserted '+inserted+' JSON '+JSON.stringify(inserted))
 								var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
@@ -133,7 +133,7 @@ var async = require('async')
 					}else{
 						db.portFolio.find({pName : data.pName },function(err,amountInfo){
 							if(!err && amountInfo){
-								new db.portFolioBalances({pName : data.pName ,rTName:data.rTName, openBal : amountInfo[0].capital, closeBal : amountInfo[0].capital, date: new Date()}).save(function(err,inserted){
+								new db.portFolioBalances({pName : data.pName ,segment:data.segment, openBal : amountInfo[0].capital, closeBal : amountInfo[0].capital, date: new Date()}).save(function(err,inserted){
 									if(!err && inserted){
 										var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
 										var totalOpenBal = (parseFloat(Math.round(amountInfo[0].capital)).toFixed(2) - total);
@@ -158,7 +158,7 @@ var async = require('async')
 		var cDate = new Date()
 		var dateString = cDate.toJSON().slice(0, 10)
 
-		db.portFolioBalances.find({pName : data.pName,rTName:data.rTName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
+		db.portFolioBalances.find({pName : data.pName,segment:data.segment,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
 			if(!err && result.length>0){
 				//console.log('result '+result[0]._id);
 				//var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
@@ -176,10 +176,10 @@ var async = require('async')
 			}else{
 				//var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
 				//var finalTotal = total + buyData.buyValue;
-				db.portFolioBalances.find({pName : data.pName,rTName:data.rTName}).sort({date:-1}).limit(1).exec(function(err,docs){
+				db.portFolioBalances.find({pName : data.pName,segment:data.segment}).sort({date:-1}).limit(1).exec(function(err,docs){
 					if(!err && docs.length>0){
 						console.log('closeBal '+docs[0].closeBal)
-						new db.portFolioBalances({pName : data.pName ,rTName:data.rTName, openBal : docs[0].closeBal, closeBal : docs[0].closeBal, date: new Date()}).save(function(err,inserted){
+						new db.portFolioBalances({pName : data.pName ,segment:data.segment, openBal : docs[0].closeBal, closeBal : docs[0].closeBal, date: new Date()}).save(function(err,inserted){
 							if(!err && inserted){
 								console.log('inserted '+inserted+' JSON '+JSON.stringify(inserted))
 								if(data.cashType === "outflow"){
@@ -200,7 +200,7 @@ var async = require('async')
 					}else{
 						db.portFolio.find({pName : data.pName },function(err,amountInfo){
 							if(!err && amountInfo){
-								new db.portFolioBalances({pName : data.pName ,rTName:data.rTName, openBal : amountInfo[0].capital, closeBal : amountInfo[0].capital, date: new Date()}).save(function(err,inserted){
+								new db.portFolioBalances({pName : data.pName ,segment:data.segment, openBal : amountInfo[0].capital, closeBal : amountInfo[0].capital, date: new Date()}).save(function(err,inserted){
 									if(!err && inserted){
 										if(data.cashType === "outflow"){
 											var totalOpenBal = parseFloat(amountInfo[0].capital) - parseFloat(data.amount);
@@ -226,7 +226,7 @@ var async = require('async')
 
 	this.addExtraCash = function(data,callback){
 		var colName = "";
-		data.rTName = "Cash"
+		data.segment = "Cash"
 
   //   	updatePortfolioBalances(data,function(dividend){
 		// 	console.log('dividend added to balances '+dividend)
@@ -341,7 +341,7 @@ var async = require('async')
 		var cDate = new Date()
 		var dateString = cDate.toJSON().slice(0, 10)
 
-		db.portFolioSaleInfo.find({pName : data.pName,rTName:data.rTName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
+		db.portFolioSaleInfo.find({pName : data.pName,segment:data.segment,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
 			if(!err && result.length>0){
 				console.log('result '+result[0]._id);
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
@@ -356,7 +356,7 @@ var async = require('async')
 			}else{
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
 				//var finalTotal = total + buyData.saleValue;
-				new db.portFolioSaleInfo({pName : data.pName,rTName:data.rTName,saleValue : total, date : new Date()}).save(function(err,saved){
+				new db.portFolioSaleInfo({pName : data.pName,segment:data.segment,saleValue : total, date : new Date()}).save(function(err,saved){
 					if(!err && saved){
 						callback()
 					}
@@ -369,7 +369,7 @@ var async = require('async')
 		var cDate = new Date()
 		var dateString = cDate.toJSON().slice(0, 10)
 
-		db.portFolioBalances.find({pName : data.pName,rTName:data.rTName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
+		db.portFolioBalances.find({pName : data.pName,segment:data.segment,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
 			if(!err && result.length>0){
 				//console.log('result '+result[0]._id);
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
@@ -383,10 +383,10 @@ var async = require('async')
 			}else{
 				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
 				//var finalTotal = total + buyData.buyValue;
-				db.portFolioBalances.find({pName : data.pName,rTName:data.rTName}).sort({date:-1}).limit(1).exec(function(err,docs){
+				db.portFolioBalances.find({pName : data.pName,segment:data.segment}).sort({date:-1}).limit(1).exec(function(err,docs){
 					if(!err && docs.length>0){
 						console.log('closeBal '+docs[0].closeBal)
-						new db.portFolioBalances({pName : data.pName ,rTName:data.rTName, openBal : docs[0].closeBal, closeBal : docs[0].closeBal, date: new Date()}).save(function(err,inserted){
+						new db.portFolioBalances({pName : data.pName ,segment:data.segment, openBal : docs[0].closeBal, closeBal : docs[0].closeBal, date: new Date()}).save(function(err,inserted){
 							if(!err && inserted){
 								console.log('inserted '+inserted+' JSON '+JSON.stringify(inserted))
 								var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
@@ -402,7 +402,7 @@ var async = require('async')
 					}else{
 						db.portFolio.find({pName : data.pName },function(err,amountInfo){
 							if(!err && amountInfo){
-								new db.portFolioBalances({pName : data.pName ,rTName:data.rTName, openBal : amountInfo[0].capital, closeBal : amountInfo[0].capital, date: new Date()}).save(function(err,inserted){
+								new db.portFolioBalances({pName : data.pName ,segment:data.segment, openBal : amountInfo[0].capital, closeBal : amountInfo[0].capital, date: new Date()}).save(function(err,inserted){
 									if(!err && inserted){
 										var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
 										var totalOpenBal = parseFloat(amountInfo[0].capital) + parseFloat(total);
@@ -493,7 +493,7 @@ var async = require('async')
 		  })
 	}
 	this.getReports = function(data,callback){
-			var query = {"pName" : data.pName}
+			var query = {"pName" : data.pName,segment:data.segment}
 			db.Report.find(query).sort({lastUpdate:-1}).exec(function(err,reports){
 				if(!err && reports.length){
 					var j=0;var reportsCon =[];
@@ -581,11 +581,15 @@ var async = require('async')
 				}
 			})
 		}else{
+			console.log(data);
+			console.log(" -------------------------------------- ")
 			db.Report.find({"pName":data.pName},{_id:0,cName:1},function(err,companiesList){
 				if(!err && companiesList){
 					console.log(companiesList)
 					var i=0,n=companiesList.length;
 					function cLoop(i){
+						console.log("*******************************")
+						console.log(companiesList[i]);
 						companies.push(companiesList[i].cName);
 						i++;
 						if(i>=n)
@@ -610,13 +614,32 @@ var async = require('async')
 		})
 	}
 	this.getPL = function(data,callback){
+		var segment = data.segment;
+		var pName = data.pName;
+		var from = getFromDate(data.from),to = getToDate(data.to);
+		db.portFolioBalances.find({date:{$gte:from,$lt:to},pName:pName})
+		.sort({date:1})
+		.exec(function(err,rows){
+			var tot = 0;
+			if(!err && rows.length){
+				var openBal = rows[0].openBal;
+				var closeBal = rows[rows.length - 1].closeBal;
+				var pl = closeBal - openBal;
+				callback({pl:pl})
+			}else{
+				console.log(" something happening " + err + " === " + rows)
+				callback({pl:0})
+			}
+		})
+	}
+	this.getPLOld = function(data,callback){
 		var closingValue,cash,purchases,sales,openingValue,dividend,inflow,outflow;
-		var rTName = data.rTName;
+		var segment = data.segment;
 		var pName = data.pName;
 		var from = getFromDate(data.from),to = getToDate(data.to);
 		function getPurchases(sCallback){
 			console.log("in purchases ........................")
-			if(rTName === ""){
+			if(segment === ""){
 				getBuyDataByRT("Equity",function(rData){
 					purchases = parseInt(rData);
 					getBuyDataByRT("Futures",function(rData){
@@ -631,7 +654,7 @@ var async = require('async')
 					})
 				})
 			}else{
-				getBuyDataByRT(rTName,function(rData){
+				getBuyDataByRT(segment,function(rData){
 					purchases = parseInt(rData);
 					sCallback(getDivInOut)
 				})
@@ -679,7 +702,7 @@ var async = require('async')
 		}
 		function getSales(sCallback){
 			console.log("in sales....................")
-			if(rTName === ""){
+			if(segment === ""){
 				getSaleDataByRT("Equity",function(rData){
 					sales = parseInt(rData);
 					getSaleDataByRT("Futures",function(rData){
@@ -694,14 +717,14 @@ var async = require('async')
 					})
 				})
 			}else{
-				getSaleDataByRT(rTName,function(rData){
+				getSaleDataByRT(segment,function(rData){
 					sales = parseInt(rData);
 					sCallback()
 				})
 			}
 		}
-		function getBuyDataByRT(rTNameVal,rTcallback){
-			db.portFolioBuyInfo.find({date:{$gte:from,$lt:to},pName:pName,rTName:rTNameVal})
+		function getBuyDataByRT(segmentVal,rTcallback){
+			db.portFolioBuyInfo.find({date:{$gte:from,$lt:to},pName:pName,segment:segmentVal})
 			.sort({date:1})
 			.exec(function(err,rows){
 				var tot = 0;
@@ -718,8 +741,8 @@ var async = require('async')
 				}
 			})
 		}
-		function getSaleDataByRT(rTNameVal,rTcallback){
-			db.portFolioSaleInfo.find({date:{$gte:from,$lt:to},pName:pName,rTName:rTNameVal})
+		function getSaleDataByRT(segmentVal,rTcallback){
+			db.portFolioSaleInfo.find({date:{$gte:from,$lt:to},pName:pName,segment:segmentVal})
 			.sort({date:1})
 			.exec(function(err,rows){
 				var tot = 0;
@@ -745,7 +768,7 @@ var async = require('async')
 			})
 		}
 		function getClosingValue(callback){
-			if(rTName === ""){
+			if(segment === ""){
 				getDataByRT("Equity",function(rData){
 					closingValue = parseInt(rData.closeBal);
 					openingValue = parseInt(rData.openBal);
@@ -764,7 +787,7 @@ var async = require('async')
 					})
 				})
 			}else{
-				getDataByRT(rTName,function(rData){
+				getDataByRT(segment,function(rData){
 					closingValue = parseInt(rData.closeBal);
 					openingValue = parseInt(rData.openBal);
 					callback()
@@ -772,9 +795,9 @@ var async = require('async')
 			}
 			
 		}
-		function getDataByRT(rTNameVal,rTcallback){
-			console.log(rTNameVal + " --------------------------> ")
-			db.portFolioBalances.find({date:{$gte:from,$lt:to},pName:pName,rTName:rTNameVal})
+		function getDataByRT(segmentVal,rTcallback){
+			console.log(segmentVal + " --------------------------> ")
+			db.portFolioBalances.find({date:{$gte:from,$lt:to},pName:pName,segment:segmentVal})
 			.sort({date:1})
 			.exec(function(err,rows){
 				if(!err && rows.length){
@@ -792,7 +815,7 @@ var async = require('async')
 				}else if(err){
 					console.log("error in getting data " + err)
 				}else{
-					db.portFolioBalances.find({date:{$lte:from},pName:pName,rTName:rTName})
+					db.portFolioBalances.find({date:{$lte:from},pName:pName,segment:segment})
 					.sort({date:-1})
 					.limit(1)
 					.exec(function(err,rows){

@@ -25,9 +25,9 @@
         socket.on('ReportType',function(data){
           var p='';
           for(var x=0;x < data.length ;x++){
-            p+='<option value="'+ data[x].rTName +'">'+data[x].rTName+'</option>'
+            p+='<option value="'+ data[x].segment +'">'+data[x].segment+'</option>'
           } 
-          $("#rTName").html(p);    
+          $("#segment").html(p);    
         })
         socket.emit('getCompanies','hi')
         socket.on('getCompanies',function(data){
@@ -37,9 +37,9 @@
           } 
           $("#cId").html(p);    
         })
-        var rTName = $("#rTName").val();
+        var segment = $("#segment").val();
         var pName = $("#pName").val();
-        socket.emit('getCompanyList',{rTName:rTName,pName:pName,type:"all"})
+        socket.emit('getCompanyList',{segment:segment,pName:pName,type:"all"})
         socket.on('getCompanyList',function(companies){
           var companylist = companies;
           $( "#cName" ).autocomplete({
@@ -50,7 +50,7 @@
           e.preventDefault();
           var data = {
             pName : $("#pName").val(),
-            rTName : $("#rTName").val(),
+            segment : $("#segment").val(),
             cName : $("#cName").val(),
             quantity : $("#quantity").val(),
             price : $("#price").val()
@@ -109,10 +109,10 @@
                     </div>
                     <div class="form-fields">
                       <span  class="form-field">
-                        <select name="rTName" id="rTName">
+                        <select name="segment" id="segment">
                           <option value="">--select--</option>
                         </select>
-                        <!-- <input type="text" name="rTName" id="rTName"> -->
+                        <!-- <input type="text" name="segment" id="segment"> -->
                       </span>
                     </div>
                   </div>

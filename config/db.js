@@ -39,7 +39,7 @@ exports.CompanyList = mongoose.model('CompanyList' , {
       "createDate" : Date
   },"CompanyList")
 exports.ReportType = mongoose.model('ReportType' , {
-      "rTName" : String,
+      "segment" : String,
       "createDate" : Date
   },"ReportType")
 exports.Report = mongoose.model('Report' , {
@@ -49,7 +49,7 @@ exports.Report = mongoose.model('Report' , {
       "price" : Number,
       "total" : Number,
       "releaseMark" : Number,
-      "rTName": String,
+      "segment": String,
       "createDate" : Date,
       "lastUpdate" : Date
   },"Report")
@@ -59,21 +59,21 @@ exports.RHistory = mongoose.model('RHistory' , {
       "quantity" : Number,
       "price" : Number,
       "buyOrSale" : String,
-      "rTName": String,
+      "segment": String,
       "createDate" : Date
   },"RHistory")
 
 exports.portFolioBuyInfo = mongoose.model('portFolioBuyInfo' , {
       "pName" : String,
       "buyValue" : Number,
-      "rTName": String,
+      "segment": String,
       "date" : Date
   },"portFolioBuyInfo")
 
 exports.portFolioSaleInfo = mongoose.model('portFolioSaleInfo' , {
       "pName" : String,
       "saleValue" : Number,
-      "rTName": String,
+      "segment": String,
       "date" : Date
   },"portFolioSaleInfo")
 
@@ -81,27 +81,27 @@ exports.portFolioDividend = mongoose.model('portFolioDividend' , {
       "pName" : String,
       "value" : Number,
       "description" : String,
-      "rTName": String,
+      "segment": String,
       "date" : Date
   },"portFolioDividend")
 exports.portFolioCashInFlow = mongoose.model('portFolioCashInFlow' , {
       "pName" : String,
       "value" : Number,
       "description" : String,
-      "rTName": String,
+      "segment": String,
       "date" : Date
   },"portFolioCashInFlow")
 exports.portFolioCashOutFlow = mongoose.model('portFolioCashOutFlow' , {
       "pName" : String,
       "value" : Number,
       "description" : String,
-      "rTName": String,
+      "segment": String,
       "date" : Date
   },"portFolioCashOutFlow")
 exports.portFolioBalances = mongoose.model('portFolioBalances' , {
       "pName" : String,
       "openBal" : Number,
       "closeBal" : String,
-      "rTName": String,
+      "segment": String,
       "date" : Date
   },"portFolioBalances")

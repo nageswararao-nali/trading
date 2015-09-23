@@ -12,16 +12,25 @@
     <script>
       var socket = io.connect();
       $(document).ready(function(){
+        socket.emit('getPortfolio','hi')
+        socket.on('getPortfolio',function(data){
+          console.log(data)
+          var p='';
+          for(var x=0;x < data.length ;x++){
+            p+='<option value="'+ data[x].pName +'">'+data[x].pName+'</option>'
+          } 
+          $("#pName").html(p);    
+        })
         $(".reportStyle").hide();
         $("#fDate" ).datepicker();
         $("#toDate" ).datepicker();
         $("#buy-form").submit(function(e){
           e.preventDefault();
-          var rTName = $("#rTName").val();
+          var segment = $("#segment").val();
           var pName = $("#pName").val();
           var from = $("#fDate").val();
           var to = $("#toDate").val();
-          socket.emit('getPL',{rTName:rTName,pName:pName,from:from,to:to})
+          socket.emit('getPL',{segment:segment,pName:pName,from:from,to:to})
           socket.on('getPL',function(PLData){
             $(".reportStyle").show();
             $("#PLData").html(" <b> Profit / Loss : "+PLData.pl + "</b> ")
@@ -49,8 +58,23 @@
               <font color='white'>
                   <center><h2>Profit / Loss</h2></center>
                   <hr>
-                  <input type="hidden" name="pName" id="pName" value="{{portfolio}}">
-                  <input type="hidden" name="rTName" id="rTName" value="{{reportType}}">
+                  <!-- <input type="hidden" name="pName" id="pName" value="{{portfolio}}"> -->
+                  <!-- <input type="hidden" name="segment" id="segment" value="{{reportType}}"> -->
+                  <div class="form-group">
+                    <div class="form-fields">
+                      <span class="form-label">
+                        <label><b>Portfolio :</b></label>
+                      </span>
+                    </div>
+                    <div class="form-fields">
+                      <span  class="form-field">
+                        <select name="pName" id="pName">
+                          <option value="">--select--</option>
+                        </select>
+                        <!-- <input type="text" name="pName" id="pName"> -->
+                      </span>
+                    </div>
+                  </div>
                   <div class="form-group">
                     <div class="form-fields">
                       <span class="form-label">

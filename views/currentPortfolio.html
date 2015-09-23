@@ -12,22 +12,48 @@
     <script>
       var socket = io.connect();
       $(document).ready(function(){
-        var portfolio = $("#pId").val();
-        socket.emit('getReports',{portfolio:portfolio})
-        socket.on('getReports',function(data){
-          if(data.length){
-            var p='<tbody>';
-            var portfolioName,reportTypeName;
-            for(var x=0;x < data.length ;x++){
-              portfolioName = data[x].pName;
-              if(data[x].quantity > 0){
-                p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cName +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td><td>'+data[x].rMark+'</td></tr>'
+        $("#share-report").hide();
+        socket.emit('getPortfolio','hi')
+        socket.on('getPortfolio',function(data){
+          console.log(data)
+          var p='<option value="">select</option>';
+          for(var x=0;x < data.length ;x++){
+            p+='<option value="'+ data[x].pName +'">'+data[x].pName+'</option>'
+          } 
+          $("#pName").html(p);    
+        })
+        socket.emit('ReportType','hi')
+        socket.on('ReportType',function(data){
+          var p='<option value="">select</option>';
+          for(var x=0;x < data.length ;x++){
+            p+='<option value="'+ data[x].segment +'">'+data[x].segment+'</option>'
+          } 
+          $("#segment").html(p);    
+        })
+        $("#segment, #pName").on("change",function(){
+          var portfolio = $("#pName").val();
+          var segment = $("#segment").val();
+          if(portfolio !== "" && segment !== ""){
+            socket.emit('getReports',{portfolio:portfolio,segment:segment})
+            socket.on('getReports',function(data){
+              if(data.length){
+                var p='<tbody>';
+                var portfolioName,reportTypeName;
+                for(var x=0;x < data.length ;x++){
+                  portfolioName = data[x].pName;
+                  if(data[x].quantity > 0){
+                    p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cName +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td><td>'+data[x].rMark+'</td></tr>'
+                  }
+                } 
+                p+= "</tbody>";
               }
-            } 
-            p+= "</tbody>";
+              $("#share-report").show();  
+              $("#share-report").append(p);  
+              $(".portfolio_name").html(portfolioName)  
+            })
+            
           }
-          $("#share-report").append(p);  
-          $(".portfolio_name").html(portfolioName)  
+          
         })
       })
     </script>
@@ -47,9 +73,42 @@
         <!-- <p>hi raheem</p> -->
         <div class="main-content">
           <div>
-            <center><h2><span>Portfolio : <span class="portfolio_name"></span></span></h2></center>
+            <center><h2>Current Portfilio</h2></center>
             <hr>
-            <input type="hidden" name="pId" id="pId" value="{{portfolio}}">
+            <font color="white">
+              <div class="form-group">
+                <div class="form-fields">
+                  <span class="form-label">
+                    <label><b>Portfolio :</b></label>
+                  </span>
+                </div>
+                <div class="form-fields">
+                  <span  class="form-field">
+                    <select name="pName" id="pName">
+                      <option value="">--select--</option>
+                    </select>
+                    <!-- <input type="text" name="pName" id="pName"> -->
+                  </span>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="form-fields">
+                  <span class="form-label">
+                    <label><b>Report Type :</b></label>
+                  </span>
+                </div>
+                <div class="form-fields">
+                  <span  class="form-field">
+                    <select name="segment" id="segment">
+                      <option value="">--select--</option>
+                    </select>
+                    <!-- <input type="text" name="segment" id="segment"> -->
+                  </span>
+                </div>
+              </div>
+            </font>
+            <!-- <input type="hidden" name="pId" id="pId" value="{{portfolio}}"> -->
+            <hr>
             <table id="share-report">
               <thead>
                 <tr>

@@ -33,7 +33,7 @@ function userModule(db){
 							pName : selectQuery.pName,
 							openBal : parseInt(selectQuery.equity) || 0,
 							closeBal : parseInt(selectQuery.equity) || 0,
-							rTName : "Equity",
+							segment : "Equity",
 							date : new Date()
 						}
 						exp = exp + (parseInt(selectQuery.futures) || 0);
@@ -43,7 +43,7 @@ function userModule(db){
 									pName : selectQuery.pName,
 									openBal : parseInt(selectQuery.futures) || 0,
 									closeBal : parseInt(selectQuery.futures) || 0,
-									rTName : "Futures",
+									segment : "Futures",
 									date : new Date()
 								}
 								exp = exp + (parseInt(selectQuery.futures) || 0)
@@ -54,7 +54,7 @@ function userModule(db){
 											pName : selectQuery.pName,
 											openBal : parseInt(selectQuery.commodity) || 0,
 											closeBal : parseInt(selectQuery.commodity) || 0,
-											rTName : "Commodities",
+											segment : "Commodities",
 											date : new Date()
 										}
 										exp = exp + (parseInt(selectQuery.commodity) || 0)
@@ -65,7 +65,7 @@ function userModule(db){
 													pName : selectQuery.pName,
 													openBal : parseInt(selectQuery.mutualfunds) || 0,
 													closeBal : parseInt(selectQuery.mutualfunds) || 0,
-													rTName : "Mutual Funds",
+													segment : "Mutual Funds",
 													date : new Date()
 												}
 												exp = exp + (parseInt(selectQuery.mutualfunds) || 0)
@@ -78,7 +78,7 @@ function userModule(db){
 															pName : selectQuery.pName,
 															openBal : bal,
 															closeBal : bal,
-															rTName : "Cash",
+															segment : "Cash",
 															date : new Date()
 														}
 														new db.portFolioBalances(portBalData).save(function(err,balances){
@@ -131,11 +131,11 @@ function userModule(db){
 	}
 
 	this.addReportType = function(selectQuery,callback){
-		db.ReportType.find({rTName:selectQuery.rTName},function(err,info){
+		db.ReportType.find({segment:selectQuery.segment},function(err,info){
 			if(!err && info.length>0){
 				callback({status:"this ReportType name already exists"})
 			}else{
-				new db.ReportType({rTName:selectQuery.rTName,createDate:new Date()}).save(function(err,saved){
+				new db.ReportType({segment:selectQuery.segment,createDate:new Date()}).save(function(err,saved){
 					if(!err && saved){
 						callback({status:"new ReportType added successfully"})
 					}else{
