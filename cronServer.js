@@ -41,7 +41,7 @@ function getUrl(urlCallback){
 			// console.log(content)
 			$ = cheerio.load(content);
 			console.log($(".report").eq(1).find("ul").eq(2).find("li a").attr("href"))
-			var fileUrl = "http://www.nseindia.com/"+$(".report").eq(1).find("ul").eq(3).find("li a").attr("href");
+			var fileUrl = "http://www.nseindia.com/"+$(".report").eq(1).find("ul").eq(2).find("li a").attr("href");
 			urlCallback(fileUrl)
 		}else{
 			console.log("error in request")
@@ -49,17 +49,17 @@ function getUrl(urlCallback){
 		}
 	})
 }
-// getUrl(function(dZipFilePath){
-// 	var dZipFileName = dZipFilePath.split("/").pop();
-// 	var dPath = "assets/files/"+dZipFileName;
-// 	request.get({uri:dZipFilePath,headers:headers}).pipe(fs.createWriteStream(dPath))
-// 	setTimeout(function(){
-// 		fs.createReadStream(dPath).pipe(unzip.Extract({ path: 'assets/ofiles/' }));
-// 		setTimeout(function(){
-// 			parseCsvFile('assets/ofiles/'+dZipFileName)
-// 		},2000)
-// 	},5000)
-// })
+getUrl(function(dZipFilePath){
+	var dZipFileName = dZipFilePath.split("/").pop();
+	var dPath = "assets/files/"+dZipFileName;
+	request.get({uri:dZipFilePath,headers:headers}).pipe(fs.createWriteStream(dPath))
+	setTimeout(function(){
+		fs.createReadStream(dPath).pipe(unzip.Extract({ path: 'assets/ofiles/' }));
+		setTimeout(function(){
+			parseCsvFile('assets/ofiles/'+dZipFileName)
+		},2000)
+	},5000)
+})
 function parseCsvFile(csvFilePath){
 	// var inputFile='assets/ofiles/cm03SEP2015bhav.csv';
 	var filepath = csvFilePath.split(".");
@@ -298,7 +298,7 @@ function updateClosingBalance(pName,date,rTName,maincallback){
 			console.log('cash '+cash+' and sharesValue '+sharesValue)
 			var closingBalance = parseFloat(cash) + parseFloat(sharesValue);
 			var dateString = date.toJSON().slice(0,10);
-			
+
 			updateToBalances(pName,date,rTName,closingBalance,function(result){
 				maincallback(closingBalance,msg)
 			})
@@ -309,6 +309,6 @@ function updateClosingBalance(pName,date,rTName,maincallback){
 
 var yesterday = new Date(new Date() - 24*60*60*1000*11)
 console.log('yesterday '+yesterday)
-updateClosingBalance("Nicobar Capital",yesterday,"Equity",function(closingBalance,msg){
-	console.log('status of updateClosingBalance is '+closingBalance+' message '+msg)
-})
+// updateClosingBalance("Nicobar Capital",yesterday,"Equity",function(closingBalance,msg){
+// 	console.log('status of updateClosingBalance is '+closingBalance+' message '+msg)
+// })
