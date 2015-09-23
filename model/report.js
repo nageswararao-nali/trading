@@ -493,60 +493,64 @@ var async = require('async')
 		  })
 	}
 	this.getReports = function(data,callback){
-			var query = {"pName" : data.pName,segment:data.segment}
-			db.Report.find(query).sort({lastUpdate:-1}).exec(function(err,reports){
-				if(!err && reports.length){
-					var j=0;var reportsCon =[];
-					var n = reports.length;
-					function rLoop(j){
-						var report = reports[j];
-						console.log('cName '+report.cName)
-						db.CompanyList.findOne({"cList.SYMBOL":report.cName},function(err,companyDetails){
-							//console.log('companyDetails '+companyDetails.length)
-							if(!err && companyDetails){
-								var rp = {};
-								rp.cName = report.cName;
-								rp.pName = report.pName;
-								rp.quantity = report.quantity;
-								rp.price = report.price;
-								rp.total = report.total;
-								rp.rMark = report.releaseMark;
-								console.log('companyDetails length '+companyDetails.cList.length)
-								for(var i = 0 ; i<companyDetails.cList.length ; i++){
-									if(companyDetails.cList[i].SYMBOL === report.cName){
-										if(companyDetails.cList[i].CLOSE !== undefined)
-											cmp = companyDetails.cList[i].CLOSE;
-										else
-											cmp = 0;	
-									}
-									//console.log('companyDetails '+companyDetails.cList[i].SYMBOL)
+		var type = data.type;
+		var query = {"pName" : data.pName,segment:data.segment}
+		if(type === "closed")
+			query.quantity = 0;
+		else
+			query.quantity = {$gt:0};
+		db.Report.find(query).sort({lastUpdate:-1}).exec(function(err,reports){
+			if(!err && reports.length){
+				var j=0;var reportsCon =[];
+				var n = reports.length;
+				function rLoop(j){
+					var report = reports[j];
+					console.log('cName '+report.cName)
+					db.CompanyList.findOne({"cList.SYMBOL":report.cName},function(err,companyDetails){
+						//console.log('companyDetails '+companyDetails.length)
+						if(!err && companyDetails){
+							var rp = {};
+							rp.cName = report.cName;
+							rp.pName = report.pName;
+							rp.quantity = report.quantity;
+							rp.price = report.price;
+							rp.total = report.total;
+							rp.rMark = report.releaseMark;
+							console.log('companyDetails length '+companyDetails.cList.length)
+							for(var i = 0 ; i<companyDetails.cList.length ; i++){
+								if(companyDetails.cList[i].SYMBOL === report.cName){
+									if(companyDetails.cList[i].CLOSE !== undefined)
+										cmp = companyDetails.cList[i].CLOSE;
+									else
+										cmp = 0;	
 								}
-
-								rp.cmp = cmp;
-								console.log(cmp + " --- " + report.quantity + " --- " + report.total)
-								rp.pl = (cmp * report.quantity) - report.total;
-								reportsCon.push(rp);
-								j++;
-								if(j>=n){
-									callback(reportsCon)
-								}else{
-									rLoop(j)
-								}
-							}else{
-								j++;
-								if(j>=n){
-									callback(reportsCon)
-								}else{
-									rLoop(j)
-								}
+								//console.log('companyDetails '+companyDetails.cList[i].SYMBOL)
 							}
-						})
-					}rLoop(j)
-				}else{
-					console.log("no reports found")
-					callback({})
-				}
-			})
+							rp.cmp = cmp;
+							console.log(cmp + " --- " + report.quantity + " --- " + report.total)
+							rp.pl = (cmp * report.quantity) - report.total;
+							reportsCon.push(rp);
+							j++;
+							if(j>=n){
+								callback(reportsCon)
+							}else{
+								rLoop(j)
+							}
+						}else{
+							j++;
+							if(j>=n){
+								callback(reportsCon)
+							}else{
+								rLoop(j)
+							}
+						}
+					})
+				}rLoop(j)
+			}else{
+				console.log("no reports found")
+				callback({})
+			}
+		})
 	}
 	this.getCmp = function(query,callback){
 		db.Company.findOne(query,{_id:0,CMP:1},function(err,companyDetails){
