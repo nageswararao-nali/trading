@@ -49,17 +49,17 @@ function getUrl(urlCallback){
 		}
 	})
 }
-getUrl(function(dZipFilePath){
-	var dZipFileName = dZipFilePath.split("/").pop();
-	var dPath = "assets/files/"+dZipFileName;
-	request.get({uri:dZipFilePath,headers:headers}).pipe(fs.createWriteStream(dPath))
-	setTimeout(function(){
-		fs.createReadStream(dPath).pipe(unzip.Extract({ path: 'assets/ofiles/' }));
-		setTimeout(function(){
-			parseCsvFile('assets/ofiles/'+dZipFileName)
-		},2000)
-	},5000)
-})
+// getUrl(function(dZipFilePath){
+// 	var dZipFileName = dZipFilePath.split("/").pop();
+// 	var dPath = "assets/files/"+dZipFileName;
+// 	request.get({uri:dZipFilePath,headers:headers}).pipe(fs.createWriteStream(dPath))
+// 	setTimeout(function(){
+// 		fs.createReadStream(dPath).pipe(unzip.Extract({ path: 'assets/ofiles/' }));
+// 		setTimeout(function(){
+// 			parseCsvFile('assets/ofiles/'+dZipFileName)
+// 		},2000)
+// 	},5000)
+// })
 function parseCsvFile(csvFilePath){
 	// var inputFile='assets/ofiles/cm03SEP2015bhav.csv';
 	var filepath = csvFilePath.split(".");
@@ -228,11 +228,11 @@ function getSharesValue(pName,date,callback){
 	})
 }
 
-	function updateToBalances(pName,date,rTName,closingBalance,callback){
+	function updateToBalances(pName,date,closingBalance,callback){
 		//var cDate = new Date()
 		var dateString = date.toJSON().slice(0, 10)
 
-		db.portFolioBalances.find({pName : pName,rTName:rTName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
+		db.portFolioBalances.find({pName : pName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
 			if(!err && result.length>0){
 				db.portFolioBalances.update({_id:result[0]._id},{closeBal : closingBalance },function(err,updated){
 					if(!err && updated){
@@ -241,10 +241,10 @@ function getSharesValue(pName,date,callback){
 					}
 				})
 			}else{
-				db.portFolioBalances.find({pName : pName,rTName:rTName}).sort({date:-1}).limit(1).exec(function(err,docs){
+				db.portFolioBalances.find({pName : pName}).sort({date:-1}).limit(1).exec(function(err,docs){
 					if(!err && docs.length>0){
 						console.log('closeBal '+docs[0].closeBal)
-						new db.portFolioBalances({pName : pName ,rTName:rTName, openBal : docs[0].closeBal, closeBal : docs[0].closeBal, date: date}).save(function(err,inserted){
+						new db.portFolioBalances({pName : pName , openBal : docs[0].closeBal, closeBal : docs[0].closeBal, date: date}).save(function(err,inserted){
 							if(!err && inserted){
 								db.portFolioBalances.update({_id:inserted._id},{closeBal : closingBalance },function(err,updated){
 									if(!err && updated){
@@ -257,7 +257,7 @@ function getSharesValue(pName,date,callback){
 					}else{
 						db.portFolio.find({pName : pName },function(err,amountInfo){
 							if(!err && amountInfo){
-								new db.portFolioBalances({pName : pName ,rTName:rTName, openBal : amountInfo[0].capital, closeBal : amountInfo[0].capital, date: date}).save(function(err,inserted){
+								new db.portFolioBalances({pName : pName , openBal : amountInfo[0].capital, closeBal : amountInfo[0].capital, date: date}).save(function(err,inserted){
 									if(!err && inserted){
 										db.portFolioBalances.update({_id:inserted._id},{closeBal : closingBalance },function(err,updated){
 											if(!err && updated){
@@ -276,7 +276,7 @@ function getSharesValue(pName,date,callback){
 		})
 	}
 
-function updateClosingBalance(pName,date,rTName,maincallback){
+function updateClosingBalance(pName,date,maincallback){
 	//process : every day evening execute this function
 	// closingBalance = cash + (shares of all companies in portfolio * cmp of that day)
 	var cash,sharesValue;
@@ -299,7 +299,7 @@ function updateClosingBalance(pName,date,rTName,maincallback){
 			var closingBalance = parseFloat(cash) + parseFloat(sharesValue);
 			var dateString = date.toJSON().slice(0,10);
 
-			updateToBalances(pName,date,rTName,closingBalance,function(result){
+			updateToBalances(pName,date,closingBalance,function(result){
 				maincallback(closingBalance,msg)
 			})
 
@@ -307,10 +307,10 @@ function updateClosingBalance(pName,date,rTName,maincallback){
 	)
 }
 
-/*var yesterday = new Date(new Date() - 24*60*60*1000*11)
+var yesterday = new Date(new Date() - 24*60*60*1000*11)
 console.log('yesterday '+yesterday)
 
-// updateClosingBalance("Nicobar Capital",yesterday,"Equity",function(closingBalance,msg){
+// updateClosingBalance("Nicobar Capital",new Date(),function(closingBalance,msg){
 // 	console.log('status of updateClosingBalance is '+closingBalance+' message '+msg)
 // })
 
