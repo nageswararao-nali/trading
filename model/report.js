@@ -584,7 +584,7 @@ var async = require('async')
 			console.log(data);
 			console.log(" -------------------------------------- ")
 			db.Report.find({"pName":data.pName},{_id:0,cName:1},function(err,companiesList){
-				if(!err && companiesList){
+				if(!err && companiesList.length>0){
 					console.log(companiesList)
 					var i=0,n=companiesList.length;
 					function cLoop(i){

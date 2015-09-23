@@ -298,7 +298,7 @@ function updateClosingBalance(pName,date,rTName,maincallback){
 			console.log('cash '+cash+' and sharesValue '+sharesValue)
 			var closingBalance = parseFloat(cash) + parseFloat(sharesValue);
 			var dateString = date.toJSON().slice(0,10);
-			
+
 			updateToBalances(pName,date,rTName,closingBalance,function(result){
 				maincallback(closingBalance,msg)
 			})
@@ -309,6 +309,8 @@ function updateClosingBalance(pName,date,rTName,maincallback){
 
 /*var yesterday = new Date(new Date() - 24*60*60*1000*11)
 console.log('yesterday '+yesterday)
-updateClosingBalance("Nicobar Capital",yesterday,"Equity",function(closingBalance,msg){
-	console.log('status of updateClosingBalance is '+closingBalance+' message '+msg)
-})*/
+
+// updateClosingBalance("Nicobar Capital",yesterday,"Equity",function(closingBalance,msg){
+// 	console.log('status of updateClosingBalance is '+closingBalance+' message '+msg)
+// })
+
