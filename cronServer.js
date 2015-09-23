@@ -307,8 +307,10 @@ function updateClosingBalance(pName,date,rTName,maincallback){
 	)
 }
 
-var yesterday = new Date(new Date() - 24*60*60*1000*11)
+/*var yesterday = new Date(new Date() - 24*60*60*1000*11)
 console.log('yesterday '+yesterday)
+
 // updateClosingBalance("Nicobar Capital",yesterday,"Equity",function(closingBalance,msg){
 // 	console.log('status of updateClosingBalance is '+closingBalance+' message '+msg)
 // })
+
