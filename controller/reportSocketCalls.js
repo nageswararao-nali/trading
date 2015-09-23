@@ -13,7 +13,7 @@ function reportSocketCalls(report,db,socket){
 		})
 	})
 	socket.on('getReports',function(data){
-		report.getReports({pId:data.portfolio},function(result){
+		report.getReports(data,function(result){
 			socket.emit('getReports',result);
 		})
 	})

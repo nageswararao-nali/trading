@@ -12,7 +12,7 @@
     <script>
       var socket = io.connect();
       $(document).ready(function(){
-        $("#share-report").hide();
+        // $("#share-report").hide();
         socket.emit('getPortfolio','hi')
         socket.on('getPortfolio',function(data){
           console.log(data)
@@ -31,13 +31,13 @@
           $("#segment").html(p);    
         })
         $("#segment, #pName").on("change",function(){
-          var portfolio = $("#pName").val();
+          var pName = $("#pName").val();
           var segment = $("#segment").val();
-          if(portfolio !== "" && segment !== ""){
-            socket.emit('getReports',{portfolio:portfolio,segment:segment})
+          if(pName !== "" && segment !== ""){
+            socket.emit('getReports',{pName:pName,segment:segment,type:"current"})
             socket.on('getReports',function(data){
+              var p='<table id="share-report_tbl"><thead><tr><th>Sno</th><th>Company Name</th><th>No of Shares</th><th>Avg Price</th><th>Total</th><th>CMP</th><th>M-M Profit/Loss</th><th>Release Mark</th></tr></thead><tbody>';
               if(data.length){
-                var p='<tbody>';
                 var portfolioName,reportTypeName;
                 for(var x=0;x < data.length ;x++){
                   portfolioName = data[x].pName;
@@ -45,11 +45,12 @@
                     p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cName +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td><td>'+data[x].rMark+'</td></tr>'
                   }
                 } 
-                p+= "</tbody>";
+              }else{
+                p+='<tr><td colspan="8">No data found</td></tr>';
               }
-              $("#share-report").show();  
-              $("#share-report").append(p);  
-              $(".portfolio_name").html(portfolioName)  
+              p+= "</tbody></table>";
+              // $("#share-report").show();  
+              $("#share-report").html(p);  
             })
             
           }
@@ -94,7 +95,7 @@
               <div class="form-group">
                 <div class="form-fields">
                   <span class="form-label">
-                    <label><b>Report Type :</b></label>
+                    <label><b>Segment :</b></label>
                   </span>
                 </div>
                 <div class="form-fields">
@@ -109,20 +110,9 @@
             </font>
             <!-- <input type="hidden" name="pId" id="pId" value="{{portfolio}}"> -->
             <hr>
-            <table id="share-report">
-              <thead>
-                <tr>
-                  <th>Sno</th>
-                  <th>Company Name</th>
-                  <th>No of Shares</th>
-                  <th>Avg Price</th>
-                  <th>Total</th>
-                  <th>CMP</th>
-                  <th>M-M Profit/Loss</th>
-                  <th>Release Mark</th>
-                </tr>
-              </thead>
-            </table>
+            <div id="share-report"> 
+            </div>
+            
           </div>
         </div>
       </div>
