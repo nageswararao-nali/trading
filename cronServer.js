@@ -42,24 +42,38 @@ function getUrl(urlCallback){
 			$ = cheerio.load(content);
 			console.log($(".report").eq(1).find("ul").eq(2).find("li a").attr("href"))
 			var fileUrl = "http://www.nseindia.com/"+$(".report").eq(1).find("ul").eq(2).find("li a").attr("href");
-			urlCallback(fileUrl)
+			var fileName = fileUrl.split("/").pop();
+			var fileNameExt = fileName.split(".")[1];
+			if(fileNameExt === "csv"){
+				console.log("in first")
+				urlCallback(fileUrl)
+			}else{
+				console.log("in second")
+				var fileUrl = "http://www.nseindia.com/"+$(".report").eq(1).find("ul").eq(3).find("li a").attr("href");
+				urlCallback(fileUrl)
+			}
 		}else{
 			console.log("error in request")
 			console.log(response)
 		}
 	})
 }
-// getUrl(function(dZipFilePath){
-// 	var dZipFileName = dZipFilePath.split("/").pop();
-// 	var dPath = "assets/files/"+dZipFileName;
-// 	request.get({uri:dZipFilePath,headers:headers}).pipe(fs.createWriteStream(dPath))
-// 	setTimeout(function(){
-// 		fs.createReadStream(dPath).pipe(unzip.Extract({ path: 'assets/ofiles/' }));
-// 		setTimeout(function(){
-// 			parseCsvFile('assets/ofiles/'+dZipFileName)
-// 		},2000)
-// 	},5000)
-// })
+function getCMP(callback){
+	getUrl(function(dZipFilePath){
+		var dZipFileName = dZipFilePath.split("/").pop();
+		var dPath = "assets/files/"+dZipFileName;
+		request.get({uri:dZipFilePath,headers:headers}).pipe(fs.createWriteStream(dPath))
+		setTimeout(function(){
+			fs.createReadStream(dPath).pipe(unzip.Extract({ path: 'assets/ofiles/' }));
+			setTimeout(function(){
+				parseCsvFile('assets/ofiles/'+dZipFileName);
+				setTimeout(function(){
+					callback()
+				},20000)
+			},2000)
+		},5000)
+	})
+}
 function parseCsvFile(csvFilePath){
 	// var inputFile='assets/ofiles/cm03SEP2015bhav.csv';
 	var filepath = csvFilePath.split(".");
@@ -313,4 +327,25 @@ console.log('yesterday '+yesterday)
 // updateClosingBalance("Nicobar Capital",new Date(),function(closingBalance,msg){
 // 	console.log('status of updateClosingBalance is '+closingBalance+' message '+msg)
 // })
-
+runScript();
+setInterval(function(){
+  runScript()
+  
+},5 * 60 * 1000);
+// setNotification();
+function runScript(){
+	console.log(new Date().getHours() + " ======= " + new Date().getMinutes() )
+	// if(new Date().getHours() == 18 && new Date().getMinutes() <= 5){
+		getCMP(function(){
+			db.portFolio.find({},{pName:1,_id:0},function(err,portfolios){
+				if(!err && portfolios.length){
+					for(var i=0;i<portfolios.length;i++){
+					    updateClosingBalance(portfolios[i].pName,new Date(),function(closingBalance,msg){
+							console.log('status of updateClosingBalance is '+closingBalance+' message '+msg)
+						})
+					}
+				}
+			})
+		})
+	// }
+}

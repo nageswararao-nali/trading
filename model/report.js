@@ -564,9 +564,9 @@ var async = require('async')
 	this.getCompanyList = function(data,callback){
 		console.log('getCompanyList socket called ')
 		var companies = [];
-		if(data.type == "all"){
-			db.CompanyList.find({},function(err,companiesList){
-				console.log('companiesList '+companiesList[0].cList.length)
+		if(data.type == "Futures"){
+			db.FutureCompanyList.find({},function(err,companiesList){
+				console.log('futurecompaniesList '+companiesList[0].cList.length)
 				if(!err && companiesList.length>0){
 					var i=0,n=companiesList[0].cList.length;
 					console.log('companies list '+n)
@@ -578,7 +578,6 @@ var async = require('async')
 							callback(companies)
 						else
 							cLoop(i);
-							
 					}cLoop(i)
 				}else{
 					callback([])
@@ -617,6 +616,13 @@ var async = require('async')
 			}
 		})
 	}
+	function getCapital(pName,callback){
+		db.portFolio.find({pName:pName},{capital :1},function(err,info) {
+			if(!err && info.length){
+				callback(info[0].capital)
+			}
+		})
+	}
 	this.getPL = function(data,callback){
 		var segment = data.segment;
 		var pName = data.pName;
@@ -629,7 +635,15 @@ var async = require('async')
 				var openBal = rows[0].openBal;
 				var closeBal = rows[rows.length - 1].closeBal;
 				var pl = closeBal - openBal;
-				callback({pl:pl})
+				getCapital(pName,function(capital){
+					var ob = {
+						closeBal : closeBal,
+						openBal : openBal,
+						cash : capital,
+						pl : pl
+					}
+					callback(ob)
+				})
 			}else{
 				console.log(" something happening " + err + " === " + rows)
 				callback({pl:0})

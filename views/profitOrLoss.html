@@ -33,11 +33,22 @@
           socket.emit('getPL',{segment:segment,pName:pName,from:from,to:to})
           socket.on('getPL',function(PLData){
             $(".reportStyle").show();
-            $("#PLData").html(" <b> Profit / Loss : "+PLData.pl + "</b> ")
+            console.log('plddata '+PLData.pl+' openbal '+PLData.openBal)
+            // $("#PLData").html("<b> Profit / Loss : "+PLData.pl + "</b> ")
+            /*$(".openBal").text(PLData.openBal);
+            $(".closeBal").text(PLData.closeBal);
+            $(".cash").text(PLData.cash);
+            $(".pl").text(PLData.pl);*/
+            $(".pl_other_data").html('<table id="share-report_tbl"><thead><tr><th>Open Balance</th><th>Closing Balance</th><th>Cash</th><th>Profit / Loss</th></tr></thead><tbody><tr><td>'+PLData.openBal+'</td><td>'+PLData.closeBal+'</td><td>'+PLData.cash+'</td><td>'+PLData.pl+'</td></tr></tbody></table>')
           })
         })
       })
     </script>
+    <style>
+      .openBal,.closeBal,.cash,.pl{
+        padding: 15px;
+      }
+    </style>
   </head>
   <body>
     <div class="header">
@@ -110,17 +121,13 @@
             </form>
           </div>
           <div>
-            <center>
-              <font color='white'>
-                <div class="reportStyle">
-                  <b>*  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *</b>
+            <div class="report_data">
+              <center>
+                <div class="pl_other_data">
+                  
                 </div>
-                <span id="PLData"></span>
-                <div class="reportStyle">
-                  <b>* * * * * * * * * * * * * * * * * * * * *</b>
-                </div>
-              </font>
-            </center>
+              </center>
+            </div>
           </div>
         </div>
       </div>

@@ -23,10 +23,3 @@ app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
 
 routes(app, db);
-
-var b = "10"
-var c = 20
-var a = 30
-var d = a + c + b;
-console.log('question is '+d)
-

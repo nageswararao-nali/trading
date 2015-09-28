@@ -498,10 +498,14 @@ th{
   margin : 10px 0 10px 0;
 }
 #share-report_tbl{
-  width:100%;
+  margin: 0 5% 20px 5%;
+  width:90%;
 }
 table, th, td {
    border: 1px solid black;
+}
+th{
+  background-color: #E8E8E8;
 }
 
 
