@@ -34,15 +34,62 @@ var headers= {
            	"User-Agent": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.97 Safari/537.11",
            	"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*;q=0.8",
            }
+
 function getUrl(urlCallback){
 	var url = "http://www.nseindia.com/products/dynaContent/equities/equities/htms/CM_homepage.htm";
 	request.get({uri:url,headers:headers},function(error,response,content){
 		if(!error && response.statusCode == 200){
 			// console.log(content)
 			$ = cheerio.load(content);
-			console.log($(".report").eq(1).find("ul").eq(2).find("li a").attr("href"))
-			var fileUrl = "http://www.nseindia.com/"+$(".report").eq(1).find("ul").eq(2).find("li a").attr("href");
-			var fileName = fileUrl.split("/").pop();
+			var i=1;
+			function findLoop(i){
+				var fileUrl = "http://www.nseindia.com/"+$(".report").eq(1).find("ul").eq(i).find("li a").attr("href");
+				var fileName = fileUrl.split("/").pop();
+				var fileNameExt = fileName.split(".")[1];
+				if(fileNameExt === "csv"){
+					console.log(i)
+					console.log($(".report").eq(1).find("ul").eq(i).find("li a").attr("href"))
+					urlCallback(fileUrl)
+				}else{
+					i++;
+					findLoop(i);
+				}
+			}findLoop(i)
+		}else{
+			console.log("error in request")
+			console.log(response)
+		}
+	})
+}
+function getFutureCMP(dZipFileName,callback){
+	console.log("************************************")
+	var monthNames = { "JAN":"01", "FEB":"02", "MAR":"03", "APRL":"04", "MAY":"05", "JUN":"06", "JUL":"07", "AUG":"08", "SEP":"09", "OCT":"10", "NOV":"11", "DEC":"12" };
+	var day = dZipFileName.substr(0,4).substr(2,2);
+	var month = dZipFileName.substring(4,dZipFileName.indexOf(dZipFileName.substr(-16)));
+	var year = dZipFileName.substr(-16).substr(0,4);
+	month = monthNames[month]
+	var fdate = day+"-"+month+"-"+year;
+	console.log(fdate);
+	console.log("************************************")
+	var futureUrl = "http://www.nseindia.com/ArchieveSearch?h_filetype=fosett&date="+fdate+"&section=FO";
+	//var url = "http://www.nseindia.com/products/dynaContent/equities/equities/htms/CM_homepage.htm";
+	request.get({uri:futureUrl,headers:headers},function(error,response,content){
+		if(!error && response.statusCode == 200){
+			// console.log(content)
+			$ = cheerio.load(content);
+			console.log("future url issssssssssssssss")
+			console.log($("a").attr("href"))
+			var fileUrl = "http://www.nseindia.com/"+$("a").attr("href");
+			var dZipFileName = fileUrl.split("/").pop();
+			var dPath = "assets/dailyfutures/"+dZipFileName;
+			request.get({uri:fileUrl,headers:headers}).pipe(fs.createWriteStream(dPath))
+			setTimeout(function(){
+				parseFutureCsvFile('assets/dailyfutures/'+dZipFileName,function(data){
+					callback(data)
+				})
+				// test1('assets/dailyfutures/'+dZipFileName)
+			},10000)
+			/*var fileName = fileUrl.split("/").pop();
 			var fileNameExt = fileName.split(".")[1];
 			if(fileNameExt === "csv"){
 				console.log("in first")
@@ -51,30 +98,98 @@ function getUrl(urlCallback){
 				console.log("in second")
 				var fileUrl = "http://www.nseindia.com/"+$(".report").eq(1).find("ul").eq(3).find("li a").attr("href");
 				urlCallback(fileUrl)
-			}
+			}*/
 		}else{
 			console.log("error in request")
-			console.log(response)
+			// console.log(response)
+			callback([])
 		}
 	})
 }
+function parseFutureCsvFile(inputFile,callback){
+	// var inputFile='assets/ofiles/cm03SEP2015bhav.csv';
+	// var inputFile=csvFilePath;
+
+	var companies = [];
+	var header = [];
+	var reportData = [];
+	var parser = parse({delimiter: ','}, function (err, data) {
+		// console.log(err)
+		// console.log(data)
+	  async.eachSeries(data, function (line, callback) {
+	  	console.log("lineeeeeeeeeeeee")
+	  	console.log(line)
+		var dataObj = {};
+	    if(header.length === 0){
+	    	header = line;
+	    	//console.log(header)
+	    	async.eachSeries(header, function (field, headerCallback) {
+	    		if(field !== "")
+	    			dataObj[field] = "";
+	    		headerCallback()
+	    	},function(){
+	    		callback();
+	    	})
+	    }else if(line[3] === ""){
+
+	    	callback()
+	    }else{
+	        header = data[0];
+	        //console.log(header)
+	        async.eachSeries(header, function (field, headerCallback) {
+	            if(field !== "")
+	                dataObj[field] = "";
+	            headerCallback()
+	        },function(){
+	            var i=0,isCom=0;
+	           
+	            // if(isCom){
+                async.eachSeries(line, function (fieldValue, headerValCallback) {
+                    if(fieldValue !== ""){
+                        dataObj[header[i]] = fieldValue;
+                    }
+                    i++;
+                    headerValCallback()
+                },function(){
+                	// dataObj.lastUpdate = new Date();
+                    reportData.push(dataObj)
+                    callback();
+                })
+	            
+	        })
+	    	
+	    }
+	  },function(){
+		console.log(reportData)
+		callback(reportData)
+	  })
+	})
+	// console.log(inputFile)
+	fs.createReadStream(inputFile).pipe(parser);
+}
+
 function getCMP(callback){
 	getUrl(function(dZipFilePath){
 		var dZipFileName = dZipFilePath.split("/").pop();
 		var dPath = "assets/files/"+dZipFileName;
-		request.get({uri:dZipFilePath,headers:headers}).pipe(fs.createWriteStream(dPath))
-		setTimeout(function(){
-			fs.createReadStream(dPath).pipe(unzip.Extract({ path: 'assets/ofiles/' }));
+		getFutureCMP(dZipFileName,function(futuresData){
+			var futuresData = futuresData;
+			request.get({uri:dZipFilePath,headers:headers}).pipe(fs.createWriteStream(dPath))
 			setTimeout(function(){
-				parseCsvFile('assets/ofiles/'+dZipFileName);
+				fs.createReadStream(dPath).pipe(unzip.Extract({ path: 'assets/ofiles/' }));
 				setTimeout(function(){
-					callback()
-				},20000)
-			},2000)
-		},5000)
+					parseCsvFile('assets/ofiles/'+dZipFileName,futuresData);
+					// callback function to run closing balance caliculations
+					// setTimeout(function(){
+					// 	callback()
+					// },20000)
+				},2000)
+			},5000)
+		});
+		
 	})
 }
-function parseCsvFile(csvFilePath){
+function parseCsvFile(csvFilePath,futuresData){
 	// var inputFile='assets/ofiles/cm03SEP2015bhav.csv';
 	var filepath = csvFilePath.split(".");
 	filepath.pop();
@@ -150,6 +265,7 @@ function parseCsvFile(csvFilePath){
 	    })*/
 		var cListData = {};
 		cListData.cList = reportData;
+		cListData.fList = futuresData;
 		cListData.createDate = new Date();
 		var cListDataQuery = new db.CompanyList(cListData) 
 		cListDataQuery.save(function(err,list){

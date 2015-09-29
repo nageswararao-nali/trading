@@ -36,12 +36,9 @@ exports.Company = mongoose.model('Company' , {
   } ,"CompanyList")*/
 exports.CompanyList = mongoose.model('CompanyList' , {
       "cList" : Array,
+      "fList" : Array,
       "createDate" : Date
   },"CompanyList")
-exports.FutureCompanyList = mongoose.model('FutureCompanyList' , {
-      "cList" : Array,
-      "createDate" : Date
-  },"FutureCompanyList")
 exports.ReportType = mongoose.model('ReportType' , {
       "segment" : String,
       "createDate" : Date
