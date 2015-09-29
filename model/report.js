@@ -564,15 +564,27 @@ var async = require('async')
 	this.getCompanyList = function(data,callback){
 		console.log('getCompanyList socket called ')
 		var companies = [];
-		if(data.type == "Futures"){
-			db.FutureCompanyList.find({},function(err,companiesList){
-				console.log('futurecompaniesList '+companiesList[0].cList.length)
+		var list = "";
+		console.log('segment '+data.segment)
+		if(data.segment == "Futures"){
+			list = "fList";
+		}else if(data.segment == "Equity"){
+			list = "cList";
+		}
+		console.log('list '+list)
+		if(data.type == "buy" || data.segment == "Futures"){
+			db.CompanyList.find({},{},function(err,companiesList){
+				console.log('futurecompaniesList '+companiesList[0][list].length)
 				if(!err && companiesList.length>0){
-					var i=0,n=companiesList[0].cList.length;
+					var i=0,n=companiesList[0][list].length;
 					console.log('companies list '+n)
-					console.log('company name '+companiesList[0].cList[1].SYMBOL)
+					//console.log('company name '+companiesList[0][list][1].SYMBOL)
 					function cLoop(i){
-						companies.push(companiesList[0].cList[i].SYMBOL);
+						if(data.segment == "Futures"){
+							companies.push(companiesList[0][list][i].UNDERLYING);
+						}else{
+							companies.push(companiesList[0][list][i].SYMBOL);
+						}
 						i++;
 						if(i>=n)
 							callback(companies)
@@ -586,7 +598,7 @@ var async = require('async')
 		}else{
 			console.log(data);
 			console.log(" -------------------------------------- ")
-			db.Report.find({"pName":data.pName},{_id:0,cName:1},function(err,companiesList){
+			db.Report.find({"pName":data.pName,segment:"Equity"},{_id:0,cName:1},function(err,companiesList){
 				if(!err && companiesList.length>0){
 					console.log(companiesList)
 					var i=0,n=companiesList.length;

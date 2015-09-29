@@ -23,7 +23,7 @@
         })
         socket.emit('ReportType','hi')
         socket.on('ReportType',function(data){
-          var p='';
+          var p='<option value="">Select</option>';
           for(var x=0;x < data.length ;x++){
             p+='<option value="'+ data[x].segment +'">'+data[x].segment+'</option>'
           } 
@@ -32,20 +32,26 @@
         socket.emit('getCompanies','hi')
         socket.on('getCompanies',function(data){
           var p='<option value="">Select</option>';
+          console.log('getCompanies '+data)
           for(var x=0;x < data.length ;x++){
             p+='<option value="'+ data[x].cName +'">'+data[x].cName+'</option>'
           } 
           $("#cId").html(p);    
         })
-        var segment = $("#segment").val();
-        var pName = $("#pName").val();
-        socket.emit('getCompanyList',{segment:segment,pName:pName,type:"all"})
-        socket.on('getCompanyList',function(companies){
-          var companylist = companies;
-          $( "#cName" ).autocomplete({
-            source: companylist
-          });
-        })
+       
+        $("#segment").on("change",function(){
+           var segment = $("#segment").val();
+          var pName = $("#pName").val();
+          console.log('segment '+segment)
+          socket.emit('getCompanyList',{segment:segment,pName:pName,type:"buy"})
+          socket.on('getCompanyList',function(companies){
+
+            var companylist = companies;
+            $( "#cName" ).autocomplete({
+              source: companylist
+            });
+          })
+       })
         $("#buy-form").submit(function(e){
           e.preventDefault();
           var data = {
@@ -110,7 +116,7 @@
                     <div class="form-fields">
                       <span  class="form-field">
                         <select name="segment" id="segment">
-                          <option value="">--select--</option>
+                          <option value="--select--">--select--</option>
                         </select>
                         <!-- <input type="text" name="segment" id="segment"> -->
                       </span>
