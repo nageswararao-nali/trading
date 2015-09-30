@@ -182,25 +182,56 @@ function getSharesValue(pName,date,callback){
 			function rLoop(j){
 				var report = reports[j];
 				console.log('cName '+report.cName)
-				db.CompanyList.findOne({'$where': 'this.createDate.toJSON().slice(0, 10) == "'+dateString+'"',"cList.SYMBOL":report.cName},function(err,companyDetails){
-					//console.log('companyDetails '+companyDetails.length)
+				var cquery = "";
+
+				if(report.segment === "Equity"){
+					cquery = {'$where': 'this.createDate.toJSON().slice(0, 10) == "'+dateString+'"',"cList.SYMBOL":report.cName}
+				}else if(report.segment === "Futures"){
+					// console.log('fmonth '+report.fMonth);
+					// var months = report.fMonth.split('-')
+					// console.log("months "+months+' month name '+months[1])
+					cquery = {'$where': 'this.createDate.toJSON().slice(0, 10) == "'+dateString+'"',"fList.UNDERLYING":report.cName}
+
+				}
+				db.CompanyList.findOne(cquery,function(err,companyDetails){
+					console.log('companyDetails '+companyDetails.createDate)
 					if(!err && companyDetails){
 						var rp = {};
+						cmp = 0
 						// rp.cName = report.cName;
 						// rp.pName = report.pName;
 						// rp.quantity = report.quantity;
 						// rp.price = report.price;
 						// rp.total = report.total;
 						// rp.rMark = report.releaseMark;
-						console.log('companyDetails length '+companyDetails.cList.length)
-						for(var i = 0 ; i<companyDetails.cList.length ; i++){
-							if(companyDetails.cList[i].SYMBOL === report.cName){
-								if(companyDetails.cList[i].CLOSE !== undefined)
-									cmp = companyDetails.cList[i].CLOSE;
-								else
-									cmp = 0;	
+						//console.log('companyDetails length '+companyDetails.cList.length)
+						if(report.segment === "Equity"){
+							for(var i = 0 ; i<companyDetails.cList.length ; i++){
+								if(companyDetails.cList[i].SYMBOL === report.cName){
+									if(companyDetails.cList[i].CLOSE !== undefined)
+										cmp = companyDetails.cList[i].CLOSE;
+									else
+										cmp = 0;	
+								}
+								//console.log('companyDetails '+companyDetails.cList[i].SYMBOL)
 							}
-							//console.log('companyDetails '+companyDetails.cList[i].SYMBOL)
+						}else if(report.segment === "Futures"){
+							console.log('details in Futures ')
+							for(var i = 0 ; i<companyDetails.fList.length ; i++){
+								var exp = "EXPIRY DATE"
+								var da = companyDetails.fList[i][exp].split('-')								
+								if(da[1] === report.fMonth){
+									//console.log('contract months  '+da[1])
+									if(companyDetails.fList[i].UNDERLYING === report.cName){
+										var s = "MTM SETTLEMENT PRICE"
+										if(companyDetails.fList[i][s] !== undefined)
+											cmp = companyDetails.fList[i][s];
+										else
+											cmp = 0;	
+									}
+								}
+								//console.log('companyDetails '+companyDetails.cList[i].SYMBOL)
+							}
 						}
 						console.log('cmp '+cmp+' cName '+report.cName+' and quantity '+report.quantity)
 
@@ -321,13 +352,13 @@ function updateClosingBalance(pName,date,maincallback){
 	)
 }
 
-var yesterday = new Date(new Date() - 24*60*60*1000*11)
-console.log('yesterday '+yesterday)
+// var yesterday = new Date(new Date() - 24*60*60*1000)
+// console.log('yesterday '+yesterday)
 
-// updateClosingBalance("Nicobar Capital",new Date(),function(closingBalance,msg){
+// updateClosingBalance("Nicobar Capital",yesterday,function(closingBalance,msg){
 // 	console.log('status of updateClosingBalance is '+closingBalance+' message '+msg)
 // })
-runScript();
+//runScript();
 setInterval(function(){
   runScript()
   
