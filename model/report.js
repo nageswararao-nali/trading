@@ -506,7 +506,14 @@ var async = require('async')
 				function rLoop(j){
 					var report = reports[j];
 					console.log('cName '+report.cName)
-					db.CompanyList.findOne({"cList.SYMBOL":report.cName},function(err,companyDetails){
+					var cquery = "";
+
+					if(report.segment === "Equity"){
+						cquery = {"cList.SYMBOL":report.cName}
+					}else if(report.segment === "Futures"){
+						cquery = {"fList.UNDERLYING":report.cName}
+					}
+					db.CompanyList.findOne(cquery,function(err,companyDetails){
 						//console.log('companyDetails '+companyDetails.length)
 						if(!err && companyDetails){
 							var rp = {};
@@ -516,7 +523,7 @@ var async = require('async')
 							rp.price = report.price;
 							rp.total = report.total;
 							rp.rMark = report.releaseMark;
-							console.log('companyDetails length '+companyDetails.cList.length)
+						if(report.segment === "Equity"){
 							for(var i = 0 ; i<companyDetails.cList.length ; i++){
 								if(companyDetails.cList[i].SYMBOL === report.cName){
 									if(companyDetails.cList[i].CLOSE !== undefined)
@@ -526,6 +533,35 @@ var async = require('async')
 								}
 								//console.log('companyDetails '+companyDetails.cList[i].SYMBOL)
 							}
+						}else if(report.segment === "Futures"){
+							console.log('details in Futures ')
+							for(var i = 0 ; i<companyDetails.fList.length ; i++){
+								var exp = "EXPIRY DATE"
+								var da = companyDetails.fList[i][exp].split('-')								
+								if(da[1] === report.fMonth){
+									rp.contract = report.fMonth
+									//console.log('contract months  '+da[1])
+									if(companyDetails.fList[i].UNDERLYING === report.cName){
+										var s = "MTM SETTLEMENT PRICE"
+										if(companyDetails.fList[i][s] !== undefined)
+											cmp = companyDetails.fList[i][s];
+										else
+											cmp = 0;	
+									}
+								}
+								//console.log('companyDetails '+companyDetails.cList[i].SYMBOL)
+							}
+						}
+							// console.log('companyDetails length '+companyDetails.cList.length)
+							// for(var i = 0 ; i<companyDetails.cList.length ; i++){
+							// 	if(companyDetails.cList[i].SYMBOL === report.cName){
+							// 		if(companyDetails.cList[i].CLOSE !== undefined)
+							// 			cmp = companyDetails.cList[i].CLOSE;
+							// 		else
+							// 			cmp = 0;	
+							// 	}
+							// 	//console.log('companyDetails '+companyDetails.cList[i].SYMBOL)
+							// }
 							rp.cmp = cmp;
 							console.log(cmp + " --- " + report.quantity + " --- " + report.total)
 							rp.pl = (cmp * report.quantity) - report.total;
