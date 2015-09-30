@@ -12,6 +12,7 @@
     <script>
       var socket = io.connect();
       $(document).ready(function(){
+        $(".fmonthCon").hide();
         socket.emit('getPortfolio','hi')
         socket.on('getPortfolio',function(data){
           console.log(data)
@@ -44,7 +45,9 @@
             var type = "sale"
             if(segment !== "Futures"){
               type = "portfolio";
+              $(".fmonthCon").hide();
             }else{
+              $(".fmonthCon").show();
             }
 
             socket.emit('getCompanyList',{segment:segment,pName:pName,type:type})
@@ -77,10 +80,19 @@
             quantity : $("#quantity").val(),
             price : $("#price").val()
           }
+          if($("#segment").val() === "Futures"){
+            if($("#fmonth").val() !== ""){
+              data.fMonth = $("#fmonth").val(); 
+              socket.emit('sellSharesFromOrg',data)
+            }else{
+              alert("select Expiry Month")
+            }
+          }else{
+            socket.emit('sellSharesFromOrg',data)
+          }
           // alert()
                console.log('buy data '+data+' stringify '+JSON.stringify(data))
      
-          socket.emit('sellSharesFromOrg',data)
           
         })
         socket.on('sellSharesFromOrg',function(data){
@@ -134,6 +146,33 @@
                         <select name="segment" id="segment">
                           <option value="">--select--</option>
                         </select>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="form-group fmonthCon">
+                    <div class="form-fields">
+                      <span class="form-label">
+                        <label><b>Expiry Month :</b></label>
+                      </span>
+                    </div>
+                    <div class="form-fields">
+                      <span  class="form-field">
+                        <select name="fmonth" id="fmonth">
+                          <option value="">--select--</option>
+                          <option value="JAN">JAN</option>
+                          <option value="FEB">FEB</option>
+                          <option value="MAR">MAR</option>
+                          <option value="APRL">APRL</option>
+                          <option value="MAY">MAY</option>
+                          <option value="JUN">JUN</option>
+                          <option value="JUL">JUL</option>
+                          <option value="AUG">AUG</option>
+                          <option value="SEP">SEP</option>
+                          <option value="OCT">OCT</option>
+                          <option value="NOV">NOV</option>
+                          <option value="DEC">DEC</option>
+                        </select>
+                        <!-- <input type="text" name="segment" id="segment"> -->
                       </span>
                     </div>
                   </div>
