@@ -273,53 +273,53 @@ function getSharesValue(pName,date,callback){
 	})
 }
 
-	function updateToBalances(pName,date,closingBalance,callback){
-		//var cDate = new Date()
-		var dateString = date.toJSON().slice(0, 10)
+function updateToBalances(pName,date,closingBalance,callback){
+	//var cDate = new Date()
+	var dateString = date.toJSON().slice(0, 10)
 
-		db.portFolioBalances.find({pName : pName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
-			if(!err && result.length>0){
-				db.portFolioBalances.update({_id:result[0]._id},{closeBal : closingBalance },function(err,updated){
-					if(!err && updated){
-						//console.log('updated success')
-						callback()
-					}
-				})
-			}else{
-				db.portFolioBalances.find({pName : pName}).sort({date:-1}).limit(1).exec(function(err,docs){
-					if(!err && docs.length>0){
-						console.log('closeBal '+docs[0].closeBal)
-						new db.portFolioBalances({pName : pName , openBal : docs[0].closeBal, closeBal : docs[0].closeBal, date: date}).save(function(err,inserted){
-							if(!err && inserted){
-								db.portFolioBalances.update({_id:inserted._id},{closeBal : closingBalance },function(err,updated){
-									if(!err && updated){
-										//console.log('updated success')
-										callback()
-									}
-								})
-							}
-						})						
-					}else{
-						db.portFolio.find({pName : pName },function(err,amountInfo){
-							if(!err && amountInfo){
-								new db.portFolioBalances({pName : pName , openBal : amountInfo[0].capital, closeBal : amountInfo[0].capital, date: date}).save(function(err,inserted){
-									if(!err && inserted){
-										db.portFolioBalances.update({_id:inserted._id},{closeBal : closingBalance },function(err,updated){
-											if(!err && updated){
-												//console.log('updated success')
-												callback()
-											}
-										})
-										//callback()
-									}
-								})
-							}
-						})
-					}
-				})
-			}	
-		})
-	}
+	db.portFolioBalances.find({pName : pName,'$where': 'this.date.toJSON().slice(0, 10) == "'+dateString+'"' },function(err,result){
+		if(!err && result.length>0){
+			db.portFolioBalances.update({_id:result[0]._id},{closeBal : closingBalance },function(err,updated){
+				if(!err && updated){
+					//console.log('updated success')
+					callback()
+				}
+			})
+		}else{
+			db.portFolioBalances.find({pName : pName}).sort({date:-1}).limit(1).exec(function(err,docs){
+				if(!err && docs.length>0){
+					console.log('closeBal '+docs[0].closeBal)
+					new db.portFolioBalances({pName : pName , openBal : docs[0].closeBal, closeBal : docs[0].closeBal, date: date}).save(function(err,inserted){
+						if(!err && inserted){
+							db.portFolioBalances.update({_id:inserted._id},{closeBal : closingBalance },function(err,updated){
+								if(!err && updated){
+									//console.log('updated success')
+									callback()
+								}
+							})
+						}
+					})						
+				}else{
+					db.portFolio.find({pName : pName },function(err,amountInfo){
+						if(!err && amountInfo){
+							new db.portFolioBalances({pName : pName , openBal : amountInfo[0].capital, closeBal : amountInfo[0].capital, date: date}).save(function(err,inserted){
+								if(!err && inserted){
+									db.portFolioBalances.update({_id:inserted._id},{closeBal : closingBalance },function(err,updated){
+										if(!err && updated){
+											//console.log('updated success')
+											callback()
+										}
+									})
+									//callback()
+								}
+							})
+						}
+					})
+				}
+			})
+		}	
+	})
+}
 
 function updateClosingBalance(pName,date,maincallback){
 	//process : every day evening execute this function
