@@ -10,8 +10,6 @@ var async = require('async')
 				var currentTotal = parseInt(data.quantity) * parseInt(data.price)
 				currentTotal = parseFloat(Math.round(currentTotal * 100) / 100).toFixed(2);
 				var total = parseFloat(doc.total) + parseFloat(currentTotal)
-				//var price = total / quantity;
-
 				var price = parseFloat(Math.round((total / quantity) * 100) /100).toFixed(2);
 				//var total = parseFloat(Math.round(quantity * price * 100) / 100).toFixed(2);
 				var lastUpdate = new Date();
@@ -27,6 +25,67 @@ var async = require('async')
 				data.createDate = new Date();
 				data.releaseMark = 0;
 				var price = data.price;
+				data.total = parseFloat(Math.round(data.quantity * price * 100) / 100).toFixed(2);
+				console.log(data)
+				new db.Report(data).save(function(err,doc){
+					if(!err && doc)
+						callback({'status':'success'});
+					else{ 
+						console.log('error in save:'+err);
+						callback({'status':'fail'});
+					}
+				})
+			}
+		})
+	}
+
+	function addBasicBuyInfoFutures(data,callback){
+		storeInRHistory(data,'buy');
+		db.Report.findOne({ 'pName': data.pName, 'cName': data.cName, fMonth : data.fMonth },function(err,doc){
+			if(!err && doc){
+				var setquery,quantity,currentTotal,total,price,releaseMark;
+				var lastUpdate = new Date();
+				if(doc.type === "buy"){
+					quantity = parseInt(doc.quantity) + parseInt(data.quantity);
+					currentTotal = parseInt(data.quantity) * parseInt(data.price)
+					currentTotal = parseFloat(Math.round(currentTotal * 100) / 100).toFixed(2);
+					total = parseFloat(doc.total) + parseFloat(currentTotal)
+					price = parseFloat(Math.round((total / quantity) * 100) /100).toFixed(2);
+					setquery = {quantity:quantity,price:price,total:total}
+				}else if(doc.type === "sell"){
+					if(data.quantity < doc.quantity){
+						quantity = parseInt(doc.quantity) - parseInt(data.quantity);
+						total = parseFloat(quantity) * parseFloat(doc.price)	
+						releaseMark = doc.releaseMark + ((data.quantity * doc.price) - (data.quantity * data.price))
+						setquery = {quantity:quantity,total:total,releaseMark : releaseMark}
+					}else if(data.quantity == doc.quantity){
+						quantity = 0;
+						total = 0
+						price = 0
+						releaseMark = doc.releaseMark + ((data.quantity * doc.price) - (data.quantity * data.price))
+						setquery = {quantity:quantity,price:price,total:total,type:"buy",releaseMark:releaseMark}
+					}else{
+						quantity = parseInt(data.quantity) - parseInt(doc.quantity);
+						price = parseFloat(data.price)
+						total = parseFloat(quantity) * parseFloat(price)
+						releaseMark = doc.releaseMark + ((doc.quantity * doc.price) - (doc.quantity * data.price))
+						setquery = {quantity:quantity,price:price,total:total,type:"buy",releaseMark:releaseMark}
+					}
+				}
+				setquery.lastUpdate = lastUpdate
+				db.Report.update({ 'pName': data.pName, 'cName': data.cName },{$set: setquery},function(err,docResult){
+					if(!err && docResult)
+						callback({'status':'update success'});
+					else{
+						console.log('error:'+err);
+						callback({'status':'update fail'})
+					}
+				})
+			}else{
+				data.createDate = new Date();
+				data.releaseMark = 0;
+				var price = data.price;
+				data.type = "buy"
 				data.total = parseFloat(Math.round(data.quantity * price * 100) / 100).toFixed(2);
 				console.log(data)
 				new db.Report(data).save(function(err,doc){
@@ -272,28 +331,37 @@ var async = require('async')
 	}
 
 	this.buySharesFromOrg = function(data,maincallback){
-		async.parallel([
-			function(callback1){
-				addBasicBuyInfo(data,function(result){
-					status = result;
-					callback1()
-				})
-		    },function(callback1){
-		    	addBuyToPortfolio(data,function(info){
-		    		callback1()
-		    	})
-			},function(callback1){
-				var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
+	
+			async.parallel([
+				function(callback1){
+					if(data.segment === "Futures"){
+						addBasicBuyInfoFutures(data,function(result){
+							status = result
+							callback1()
+						})
+					}else{
+						addBasicBuyInfo(data,function(result){
+							status = result;
+							callback1()
+						})
+					}
+			    },function(callback1){
+			    	addBuyToPortfolio(data,function(info){
+			    		callback1()
+			    	})
+				},function(callback1){
+					var total = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
 
-		    	addChangesToCash(data.pName,total,"subtract",function(info){
-		    		callback1()
-		    	})
-			}],
-			function(err,result){
-				maincallback(status)
-				console.log('buy success '+status)
-			}
-		)
+			    	addChangesToCash(data.pName,total,"subtract",function(info){
+			    		callback1()
+			    	})
+				}],
+				function(err,result){
+					maincallback(status)
+					console.log('buy success '+status)
+				}
+			)
+		
 		// console.log(JSON.stringify(data))
 		// {"pId":"","rTId":"55e7d548bf3390c511fbeaf8","cId":"55e810a7c49b68c812b7f780","quantity":"100","price":"15"}
 
@@ -331,8 +399,76 @@ var async = require('async')
 				}
 				
 			}else{
-				console.log('something here >>>>'+err);
-				callback({'status':'dont have enough shares to sell'});
+	
+					console.log('something here >>>>'+err);
+					callback({'status':'dont have enough shares to sell'});
+			}
+		})
+	}
+
+	function addBasicSellInfoFutures(data,callback){
+		storeInRHistory(data,'sell');
+		db.Report.findOne({ 'pName': data.pName, 'cName': data.cName, fMonth : data.fMonth},function(err,doc){
+			if(!err && doc){
+				var setquery = {}
+				var quantity,total,price,releaseMark,currentTotal;
+			 // 	var quantity = parseInt(doc.quantity) - parseInt(data.quantity);
+				// var total = parseFloat(Math.round(quantity * doc.price * 100) / 100).toFixed(2);
+				// console.log('quantity:'+quantity+'\ntotal:'+total)
+				// console.log('------------------\n'+JSON.stringify(doc))
+				// var releaseMark = doc.releaseMark + ((data.quantity * data.price) - (data.quantity * doc.price))
+				if(doc.type === "sell"){
+					quantity = parseInt(doc.quantity) + parseInt(data.quantity)
+					currentTotal = parseFloat(Math.round(data.quantity * data.price * 100) / 100).toFixed(2);
+					total = parseInt(doc.total) + parseInt(currentTotal) 
+					price = parseFloat(Math.round((total / quantity) * 100) /100).toFixed(2);
+					setquery = { 'quantity':quantity ,'total':total ,price : price }
+				}else if(doc.type === "buy"){
+					if(data.quantity < doc.quantity){
+						quantity = parseInt(doc.quantity) - parseInt(data.quantity)
+						total = parseFloat(Math.round(quantity * doc.price * 100) / 100).toFixed(2);
+						releaseMark = doc.releaseMark + ((data.quantity * data.price) - (data.quantity * doc.price))
+						setquery = { 'quantity':quantity ,'total':total, releaseMark : releaseMark }
+						console.log('setquery '+setquery)
+					}else if(data.quantity === doc.quantity){
+						quantity = 0;
+						price = 0;
+						total = 0;
+						releaseMark = doc.releaseMark + ((data.quantity * data.price) - (data.quantity * doc.price))
+						setquery = { 'quantity':quantity ,price : price,'total':total, releaseMark : releaseMark, type: "sell" }
+					}else{
+						quantity = parseInt(data.quantity) - parseInt(doc.quantity)
+						price = doc.price
+						total = parseFloat(Math.round(quantity * price * 100) / 100).toFixed(2);
+						releaseMark = doc.releaseMark + ((doc.quantity * data.price) - (doc.quantity * doc.price))
+						setquery = { 'quantity':quantity ,'total':total ,price : price,releaseMark : releaseMark, type:"sell" }
+					}
+				}				
+				setquery.lastUpdate = new Date()
+				db.Report.update({ '_id':doc._id },{$set:setquery},function(err,docResult){
+					if(!err && docResult){
+						callback({'status':'update success'});
+					}
+					else{
+						console.log('error >>> :'+err);
+						callback({'status':'update fail'})
+					}
+				})				
+			}else{
+				data.createDate = new Date();
+				data.releaseMark = 0;
+				data.type = "sell"
+				var price = data.price;
+				data.total = parseFloat(Math.round(data.quantity * price * 100) / 100).toFixed(2);
+				console.log(data)
+				new db.Report(data).save(function(err,doc){
+					if(!err && doc)
+						callback({'status':'success'});
+					else{ 
+						console.log('error in save:'+err);
+						callback({'status':'fail'});
+					}
+				})
 			}
 		})
 	}
@@ -424,12 +560,22 @@ var async = require('async')
 	}
 
 	this.sellSharesFromOrg = function(data,maincallback){
+		console.log('sellSharesFromOrg '+data+' stringify '+JSON.stringify(data))
 		async.parallel([
 			function(callback1){
-				addBasicSellInfo(data,function(result){
-					status = result;
-					callback1()
-				})
+				console.log("segment name "+data.segment)
+				if(data.segment === "Futures"){
+					addBasicSellInfoFutures(data,function(result){
+						console.log('result at addBasicSellInfoFutures'+result)
+						status = result;
+						callback1()
+					})					
+				}else{
+					addBasicSellInfo(data,function(result){
+						status = result;
+						callback1()
+					})
+				}
 		    },function(callback1){
 		    	addSellToPortfolio(data,function(info){
 		    		callback1()

@@ -78,11 +78,13 @@
             segment : $("#segment").val(),
             cName : $("#cName").val(),
             quantity : $("#quantity").val(),
-            price : $("#price").val()
+            price : $("#price").val(),
+            type : "sell"
           }
           if($("#segment").val() === "Futures"){
             if($("#fmonth").val() !== ""){
               data.fMonth = $("#fmonth").val(); 
+              console.log(data)
               socket.emit('sellSharesFromOrg',data)
             }else{
               alert("select Expiry Month")
