@@ -53,7 +53,8 @@ exports.Report = mongoose.model('Report' , {
       "segment": String,
       "createDate" : Date,
       "lastUpdate" : Date,
-      "fMonth" : String
+      "fMonth" : String,
+      "type" : String
   },"Report")
 exports.RHistory = mongoose.model('RHistory' , {
       "pName" : String,
