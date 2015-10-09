@@ -30,6 +30,7 @@ request.get({uri:dZipFilePath,headers:headers}).pipe(fs.createWriteStream(dPath)
 setInterval(function(){
 	fs.createReadStream(dPath).pipe(unzip.Extract({ path: 'assets/ofiles/' }));
 },10000)*/
+var futuresReports;
 var headers= { 
            	"User-Agent": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.97 Safari/537.11",
            	"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*;q=0.8",
@@ -173,6 +174,7 @@ function getCMP(callback){
 		var dZipFileName = dZipFilePath.split("/").pop();
 		var dPath = "assets/files/"+dZipFileName;
 		getFutureCMP(dZipFileName,function(futuresData){
+			console.log("got futures next to get cmp")
 			var futuresData = futuresData;
 			request.get({uri:dZipFilePath,headers:headers}).pipe(fs.createWriteStream(dPath))
 			setTimeout(function(){
@@ -191,6 +193,7 @@ function getCMP(callback){
 }
 function parseCsvFile(csvFilePath,futuresData){
 	// var inputFile='assets/ofiles/cm03SEP2015bhav.csv';
+	var futuresData = futuresData;
 	var filepath = csvFilePath.split(".");
 	filepath.pop();
 	var inputFile=filepath.join(".");
@@ -298,56 +301,25 @@ function getSharesValue(pName,date,callback){
 			function rLoop(j){
 				var report = reports[j];
 				console.log('cName '+report.cName)
-				var cquery = "";
-
-				if(report.segment === "Equity"){
-					cquery = {'$where': 'this.createDate.toJSON().slice(0, 10) == "'+dateString+'"',"cList.SYMBOL":report.cName}
-				}else if(report.segment === "Futures"){
-					// console.log('fmonth '+report.fMonth);
-					// var months = report.fMonth.split('-')
-					// console.log("months "+months+' month name '+months[1])
-					cquery = {'$where': 'this.createDate.toJSON().slice(0, 10) == "'+dateString+'"',"fList.UNDERLYING":report.cName}
-
-				}
-				db.CompanyList.findOne(cquery,function(err,companyDetails){
-					console.log('companyDetails '+companyDetails.createDate)
+				db.CompanyList.findOne({'$where': 'this.createDate.toJSON().slice(0, 10) == "'+dateString+'"',"cList.SYMBOL":report.cName},function(err,companyDetails){
+					//console.log('companyDetails '+companyDetails.length)
 					if(!err && companyDetails){
 						var rp = {};
-						cmp = 0
 						// rp.cName = report.cName;
 						// rp.pName = report.pName;
 						// rp.quantity = report.quantity;
 						// rp.price = report.price;
 						// rp.total = report.total;
 						// rp.rMark = report.releaseMark;
-						//console.log('companyDetails length '+companyDetails.cList.length)
-						if(report.segment === "Equity"){
-							for(var i = 0 ; i<companyDetails.cList.length ; i++){
-								if(companyDetails.cList[i].SYMBOL === report.cName){
-									if(companyDetails.cList[i].CLOSE !== undefined)
-										cmp = companyDetails.cList[i].CLOSE;
-									else
-										cmp = 0;	
-								}
-								//console.log('companyDetails '+companyDetails.cList[i].SYMBOL)
+						console.log('companyDetails length '+companyDetails.cList.length)
+						for(var i = 0 ; i<companyDetails.cList.length ; i++){
+							if(companyDetails.cList[i].SYMBOL === report.cName){
+								if(companyDetails.cList[i].CLOSE !== undefined)
+									cmp = companyDetails.cList[i].CLOSE;
+								else
+									cmp = 0;	
 							}
-						}else if(report.segment === "Futures"){
-							console.log('details in Futures ')
-							for(var i = 0 ; i<companyDetails.fList.length ; i++){
-								var exp = "EXPIRY DATE"
-								var da = companyDetails.fList[i][exp].split('-')								
-								if(da[1] === report.fMonth){
-									//console.log('contract months  '+da[1])
-									if(companyDetails.fList[i].UNDERLYING === report.cName){
-										var s = "MTM SETTLEMENT PRICE"
-										if(companyDetails.fList[i][s] !== undefined)
-											cmp = companyDetails.fList[i][s];
-										else
-											cmp = 0;	
-									}
-								}
-								//console.log('companyDetails '+companyDetails.cList[i].SYMBOL)
-							}
+							//console.log('companyDetails '+companyDetails.cList[i].SYMBOL)
 						}
 						console.log('cmp '+cmp+' cName '+report.cName+' and quantity '+report.quantity)
 
@@ -357,12 +329,7 @@ function getSharesValue(pName,date,callback){
 						// rp.pl = (cmp * report.quantity) - report.total;
 						var total = parseFloat(Math.round(report.quantity * cmp * 100) / 100).toFixed(2);
 						console.log('total '+total)
-						if(report.segment === "Futures" && report.type === "sell"){
-							console.log('alltotal at futures sell '+total)
-							alltotal -= parseFloat(total)
-						}else{
-							alltotal += parseFloat(total);
-						}
+						alltotal += parseFloat(total);
 						console.log('alltotal '+alltotal)
 						
 						
@@ -393,78 +360,6 @@ function getSharesValue(pName,date,callback){
 		}
 	})
 }
-
-// function getSharesValue(pName,date,callback){
-// 	var query = {"pName" : pName}
-// 	var dateString = date.toJSON().slice(0, 10)
-// 	var status = {}
-// 	var alltotal = 0
-// 	db.Report.find(query).exec(function(err,reports){
-// 		if(!err && reports.length){
-// 			var j=0;var reportsCon =[];
-// 			var n = reports.length;
-// 			function rLoop(j){
-// 				var report = reports[j];
-// 				console.log('cName '+report.cName)
-// 				db.CompanyList.findOne({'$where': 'this.createDate.toJSON().slice(0, 10) == "'+dateString+'"',"cList.SYMBOL":report.cName},function(err,companyDetails){
-// 					//console.log('companyDetails '+companyDetails.length)
-// 					if(!err && companyDetails){
-// 						var rp = {};
-// 						// rp.cName = report.cName;
-// 						// rp.pName = report.pName;
-// 						// rp.quantity = report.quantity;
-// 						// rp.price = report.price;
-// 						// rp.total = report.total;
-// 						// rp.rMark = report.releaseMark;
-// 						console.log('companyDetails length '+companyDetails.cList.length)
-// 						for(var i = 0 ; i<companyDetails.cList.length ; i++){
-// 							if(companyDetails.cList[i].SYMBOL === report.cName){
-// 								if(companyDetails.cList[i].CLOSE !== undefined)
-// 									cmp = companyDetails.cList[i].CLOSE;
-// 								else
-// 									cmp = 0;	
-// 							}
-// 							//console.log('companyDetails '+companyDetails.cList[i].SYMBOL)
-// 						}
-// 						console.log('cmp '+cmp+' cName '+report.cName+' and quantity '+report.quantity)
-
-
-// 						// rp.cmp = cmp;
-// 						// console.log(cmp + " --- " + report.quantity + " --- " + report.total)
-// 						// rp.pl = (cmp * report.quantity) - report.total;
-// 						var total = parseFloat(Math.round(report.quantity * cmp * 100) / 100).toFixed(2);
-// 						console.log('total '+total)
-// 						alltotal += parseFloat(total);
-// 						console.log('alltotal '+alltotal)
-						
-						
-// 						j++;
-// 						if(j>=n){
-// 							status.msg = "success"
-// 							status.alltotal = alltotal
-// 							callback(status)
-// 						}else{
-// 							rLoop(j)
-// 						}
-// 					}else{
-// 						j++;
-// 						if(j>=n){
-// 							status.msg = "inconvenient data in CompanyList"
-// 							status.alltotal = alltotal
-// 							callback(status)
-// 						}else{
-// 							rLoop(j)
-// 						}
-// 					}
-// 				})
-// 			}rLoop(j)
-// 		}else{
-// 			console.log("no reports found")
-// 			status.msg = "no records found"
-// 			callback(status)
-// 		}
-// 	})
-// }
 
 function updateToBalances(pName,date,closingBalance,callback){
 	//var cDate = new Date()
@@ -536,7 +431,7 @@ function updateClosingBalance(pName,date,maincallback){
 			console.log('cash '+cash+' and sharesValue '+sharesValue)
 			var closingBalance = parseFloat(cash) + parseFloat(sharesValue);
 			var dateString = date.toJSON().slice(0,10);
-
+			
 			updateToBalances(pName,date,closingBalance,function(result){
 				maincallback(closingBalance,msg)
 			})
@@ -548,9 +443,9 @@ function updateClosingBalance(pName,date,maincallback){
 var yesterday = new Date(new Date() - 24*60*60*1000*11)
 console.log('yesterday '+yesterday)
 
-updateClosingBalance("Nicobar Capital",new Date(),function(closingBalance,msg){
-	console.log('status of updateClosingBalance is '+closingBalance+' message '+msg)
-})
+// updateClosingBalance("Nicobar Capital",new Date(),function(closingBalance,msg){
+// 	console.log('status of updateClosingBalance is '+closingBalance+' message '+msg)
+// })
 runScript();
 setInterval(function(){
   runScript()

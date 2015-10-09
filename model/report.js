@@ -680,6 +680,7 @@ var async = require('async')
 									//console.log('companyDetails '+companyDetails.cList[i].SYMBOL)
 								}
 							}else if(report.segment === "Futures"){
+								rp.bstype = report.type; 
 								console.log('details in Futures ')
 								for(var i = 0 ; i<companyDetails.fList.length ; i++){
 									var exp = "EXPIRY DATE"
@@ -710,7 +711,15 @@ var async = require('async')
 							// }
 							rp.cmp = cmp;
 							console.log(cmp + " --- " + report.quantity + " --- " + report.total)
-							rp.pl = (cmp * report.quantity) - report.total;
+							if(report.segment === "Futures"){
+								if(report.type === "buy"){
+									rp.pl = (cmp * report.quantity) - report.total;
+								}else{
+									rp.pl = report.total - (cmp * report.quantity);
+								}
+							}else{
+								rp.pl = (cmp * report.quantity) - report.total;
+							}
 							reportsCon.push(rp);
 							j++;
 							if(j>=n){
@@ -746,23 +755,28 @@ var async = require('async')
 	this.getCompanyList = function(data,callback){
 		console.log('getCompanyList socket called ')
 		var companies = [];
-		var list = "";
+		var list = "",distinctF="";
 		console.log('segment '+data.segment)
 		if(data.segment == "Futures"){
 			list = "fList";
+			distinctF = "fList.UNDERLYING";
 		}else if(data.segment == "Equity"){
 			list = "cList";
+			distinctF = "cList.SYMBOL";
 		}
 		console.log('list '+list)
 		if(data.type == "buy" || data.segment == "Futures"){
-			db.CompanyList.find({},{},function(err,companiesList){
-				console.log('futurecompaniesList '+companiesList[0][list].length)
+			db.CompanyList.distinct(distinctF,{},function(err,companiesList){
+				// console.log(companiesList)
+				// console.log('futurecompaniesList '+companiesList[0][list].length)
 				if(!err && companiesList.length>0){
-					var i=0,n=companiesList[0][list].length;
-					console.log('companies list '+n)
+					/*var i=0,n=companiesList[0][list].length;
+					console.log('companies list '+n)*/
 					//console.log('company name '+companiesList[0][list][1].SYMBOL)
-					function cLoop(i){
+					/*function cLoop(i){
 						if(data.segment == "Futures"){
+							console.log("------------------------------")
+							console.log(companiesList[0][list][i])
 							companies.push(companiesList[0][list][i].UNDERLYING);
 						}else{
 							companies.push(companiesList[0][list][i].SYMBOL);
@@ -772,7 +786,8 @@ var async = require('async')
 							callback(companies)
 						else
 							cLoop(i);
-					}cLoop(i)
+					}cLoop(i)*/
+					callback(companiesList)
 				}else{
 					callback([])
 				}
