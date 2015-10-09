@@ -548,9 +548,9 @@ function updateClosingBalance(pName,date,maincallback){
 var yesterday = new Date(new Date() - 24*60*60*1000*11)
 console.log('yesterday '+yesterday)
 
-updateClosingBalance("Nicobar Capital",new Date(),function(closingBalance,msg){
-	console.log('status of updateClosingBalance is '+closingBalance+' message '+msg)
-})
+// updateClosingBalance("Nicobar Capital",new Date(),function(closingBalance,msg){
+// 	console.log('status of updateClosingBalance is '+closingBalance+' message '+msg)
+// })
 runScript();
 setInterval(function(){
   runScript()
