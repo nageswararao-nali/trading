@@ -551,9 +551,9 @@ console.log('yesterday '+yesterday)
 // updateClosingBalance("Nicobar Capital",new Date(),function(closingBalance,msg){
 // 	console.log('status of updateClosingBalance is '+closingBalance+' message '+msg)
 // })
-runScript();
+//runScript();
 setInterval(function(){
-  runScript()
+ // runScript()
   
 },5 * 60 * 1000);
 // setNotification();
@@ -566,10 +566,92 @@ function runScript(){
 					for(var i=0;i<portfolios.length;i++){
 					    updateClosingBalance(portfolios[i].pName,new Date(),function(closingBalance,msg){
 							console.log('status of updateClosingBalance is '+closingBalance+' message '+msg)
+							completePendingTransactions()
 						})
+
 					}
 				}
 			})
 		})
 	// }
 }
+
+	function addChangesToCash(pName,amount,type,callback){
+		var updateQuery = {}
+		if(type == "subtract"){
+			updateQuery.capital = -amount;
+		}else{
+			updateQuery.capital = amount
+		}
+		db.portFolio.update({pName : pName},{$inc : updateQuery},function(err,updated){
+			if(!err && updated){
+				callback()
+			}
+		})
+		
+		//console.log('data '+data+' stringify '+JSON.stringify(data))
+	}
+
+
+function completePendingTransactions(callback){
+	//check for present month future sell/buy trasaction with quantity > 0
+	//if current date is higher than or equal to expiry date complete the trasaction for every company
+	//if buy records present sell them or if sell records present buy them
+	var monthNames = ["JAN", "FEB", "MAR", "APRL", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
+	var cdate = new Date()
+	var cmonth = monthNames[cdate.getMonth()]
+	var cday = cdate.getDate()
+	console.log('current month '+cmonth+' current date '+cdate.getDate())
+	var cnames = [];
+	var dateString = cdate.toJSON().slice(0, 10)
+
+
+	db.Report.find({segment:"Futures",fMonth : cmonth,quantity : {$gt : 0}},function(err,result){
+		if(!err && result){
+			//console.log('result '+result)
+			for(var i = 0 ; i<result.length ; i++){
+				cnames.push(result[i].cName)
+				console.log('result '+result[i].cName)		
+				var cquery = {'$where': 'this.createDate.toJSON().slice(0, 10) == "'+dateString+'"',"fList.UNDERLYING":result[i].cName}
+				db.CompanyList.find(cquery,function(err,companyDetails){
+					if(!err && companyDetails){
+						//console.log('companyDetails '+companyDetails)
+						for(var i = 0 ; i<companyDetails[0].fList.length ; i++){
+							var exp = "EXPIRY DATE"
+							var da = companyDetails[0].fList[i][exp].split('-')								
+							if(da[1] === cmonth && da[0] <= cday){
+								console.log('contract months  '+da[1])
+								if(companyDetails[0].fList[i].UNDERLYING === report.cName){
+									var s = "MTM SETTLEMENT PRICE"
+									if(companyDetails[0].fList[i][s] !== undefined)
+										cmp = companyDetails[0].fList[i][s];
+									else
+										cmp = 0;	
+								}
+								var amount = parseFloat(Math.round(result[i].quantity * cmp * 100) / 100).toFixed(2);
+								if(result[i].type === "buy"){
+									addChangesToCash(result[0].pName,amount,"add",function(err,updated){
+										db.Report.update({_id:result[0]._id},{$set : {quantity : 0 , price : 0 , total : 0, type : "sell"}},function(err,reportUpdated){
+											callback()
+										})
+									})
+								}else{
+									addChangesToCash(result[0].pName,amount,"subtract",function(err,updated){
+										db.Report.update({_id:result[0]._id},{$set : {quantity : 0 , price : 0 , total : 0, type : "buy"}},function(err,reportUpdated){
+											callback()
+										})
+									})
+								}
+								//add final cash to portfolios
+								//update report to close transactions
+							}
+							//console.log('companyDetails '+companyDetails.cList[i].SYMBOL)
+						}					
+					}
+				})		
+			}
+		}
+	})
+}
+
