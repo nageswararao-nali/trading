@@ -36,12 +36,12 @@
           if(pName !== "" && segment !== ""){
             socket.emit('getReports',{pName:pName,segment:segment,type:"closed"})
             socket.on('getReports',function(data){
-              var p='<table id="share-report_tbl"><thead><tr><th>Sno</th><th>Company Name</th><th>No of Shares</th><th>Avg Price</th><th>Total</th><th>CMP</th><th>M-M Profit/Loss</th><th>Release Mark</th></tr></thead><tbody>';
+              var p='<table id="share-report_tbl"><thead><tr><th>Sno</th><th>Company Name</th><th>No of Shares</th><th>Avg Price</th><th>Total</th><th>CMP</th><th>M-M Profit/Loss</th><th>Realise Profit</th></tr></thead><tbody>';
               if(data.length){
                 var portfolioName,reportTypeName;
                 for(var x=0;x < data.length ;x++){
                   portfolioName = data[x].pName;
-                  p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cName +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td><td>'+data[x].rMark+'</td></tr>'
+                  p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cName +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td><td>'+parseFloat(data[x].rMark).toFixed(2)+'</td></tr>'
                 } 
               }else{
                 p+='<tr><td colspan="8">No data found</td></tr>';
