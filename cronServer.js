@@ -446,7 +446,7 @@ console.log('yesterday '+yesterday)
 // updateClosingBalance("Nicobar Capital",new Date(),function(closingBalance,msg){
 // 	console.log('status of updateClosingBalance is '+closingBalance+' message '+msg)
 // })
-//runScript();
+runScript();
 setInterval(function(){
  runScript()
   

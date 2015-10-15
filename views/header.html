@@ -1,9 +1,24 @@
-
 <nav class="main-nav">
   <ul class="nav">
-    <!-- <li class="{% if activeMenu == 'home'  %} active {% endif %}"><a href="/dashboard" class="nav-icon" title="Home"><span class="icon-home">Home</span></a></li> -->
-    <li  class="{% if activeMenu == 'buy' %} active {% endif %}"><a class="menu-item" href="/buy" title="Buy">Buy</a></li>
-    <li  class="{% if activeMenu == 'sale'  %} active {% endif %}"><a class="menu-item" href="/sale" title="Sale">Sale</a></li>
-    <li  class="{% if activeMenu == 'report' %} active {% endif %}"><a class="menu-item" href="/reports/currentPortfolio" title="Reports">Reports</a></li>
+    <!-- 
+    <li class="{% if activeMenu == 'home'  %} active {% endif %}">
+    	<a href="/dashboard" class="nav-icon" title="Home"><span class="icon-home">Home</span></a>
+    </li> 
+	-->
+    <li  class="{% if activeMenu == 'addNewPortfolio' %} active {% endif %}">
+    	<a href="/addNewPortfolio" class="menu-item" title="Add New">Add New Portfolio</a>
+    </li>
+    <li  class="{% if activeMenu == 'updatePortfolio' %} active {% endif %}">
+    	<a href="/updatePortfolio" class="menu-item" title="update">Update Portfolio</a>
+    </li>
+    <li  class="{% if activeMenu == 'buy' %} active {% endif %}">
+    	<a class="menu-item" href="/buy" title="Buy">Buy</a>
+    </li>
+    <li  class="{% if activeMenu == 'sale'  %} active {% endif %}">
+    	<a class="menu-item" href="/sale" title="Sale">Sale</a>
+    </li>
+    <li  class="{% if activeMenu == 'report' %} active {% endif %}">
+    	<a class="menu-item" href="/reports/currentPortfolio" title="Reports">Reports</a>
+    </li>
   </ul>
 </nav>

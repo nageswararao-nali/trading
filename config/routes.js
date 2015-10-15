@@ -49,6 +49,20 @@ module.exports = function(app,db){
       		res.render("adminLogin.html");
 		}
 	});
+	app.get('/addNewPortfolio',function(req,res){
+		if(req.session.isUserLoggedIn){
+  			res.render("addNewPortfolio.html",{activeMenu:"addNewPortfolio",activeTab:""});
+		}else{
+      		res.render("adminLogin.html");
+		}
+	});
+	app.get('/updatePortfolio',function(req,res){
+		if(req.session.isUserLoggedIn){
+  			res.render("updatePortfolio.html",{activeMenu:"updatePortfolio",activeTab:""});
+		}else{
+      		res.render("adminLogin.html");
+		}
+	});
 	app.get('/reports/:reportType',function(req,res){
 		if(req.session.isUserLoggedIn){
       		var reportPage = req.param("reportType");

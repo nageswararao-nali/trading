@@ -34,11 +34,7 @@
           var pName = $("#pName").val();
           var segment = $("#segment").val();
           if(pName !== "" && segment !== ""){
-            /*if(segment == "Futures"){
-              socket.emit('getFuturesReports',{pName:pName,segment:segment,type:"current"})
-            }else{*/
-              socket.emit('getReports',{pName:pName,segment:segment,type:"current"})
-            // }
+            socket.emit('getReports',{pName:pName,segment:segment,type:"current"})
             socket.on('getReports',function(data){
               console.log(data)
               if(segment === "Futures"){
