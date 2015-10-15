@@ -659,7 +659,7 @@ var async = require('async')
 					}else if(report.segment === "Futures"){
 						cquery = {"fList.UNDERLYING":report.cName}
 					}
-					db.CompanyList.findOne(cquery,function(err,companyDetails){
+					db.CompanyList.findOne(cquery).sort({lastUpdate:-1}).exec(function(err,companyDetails){
 						//console.log('companyDetails '+companyDetails.length)
 						if(!err && companyDetails){
 							var rp = {};

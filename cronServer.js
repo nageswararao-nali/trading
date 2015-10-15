@@ -266,6 +266,7 @@ function parseCsvFile(csvFilePath,futuresData){
 	    },function(){
 	        console.log("cmp updated successfully")
 	    })*/
+//var yesterday = new Date(new Date() - 24*60*60*1000)
 		var cListData = {};
 		cListData.cList = reportData;
 		cListData.fList = futuresData;
@@ -446,7 +447,7 @@ console.log('yesterday '+yesterday)
 // updateClosingBalance("Nicobar Capital",new Date(),function(closingBalance,msg){
 // 	console.log('status of updateClosingBalance is '+closingBalance+' message '+msg)
 // })
-//runScript();
+runScript();
 setInterval(function(){
  runScript()
   
