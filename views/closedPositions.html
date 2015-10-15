@@ -30,7 +30,7 @@
           } 
           $("#segment").html(p);    
         })
-        $("#segment, #pName").on("change",function(){
+         $("#segment, #pName").on("change",function(){
           var pName = $("#pName").val();
           var segment = $("#segment").val();
           if(pName !== "" && segment !== ""){
@@ -39,10 +39,10 @@
               console.log(data)
               if(segment === "Futures"){
                 var col = 8
-                var p='<table id="share-report_tbl"><thead><tr><th>Sno</th><th>Company Name</th><th>Contract Month</th><th>Buy / Sale</th><th>No of Shares</th><th>Avg Price</th><th>Total</th><th>CMP</th><th>M-M Profit/Loss</th><th>Realized Profit</th></tr></thead><tbody>';
+                var p='<table id="share-report_tbl"><thead><tr><th>Sno</th><th>Company Name</th><th>Contract Month</th><th>Buy / Sale</th><th>No of Shares</th><th>Avg Price</th><th>Total</th><th>CMP</th><th>M-M Profit/Loss</th><th>Realise Profit</th></tr></thead><tbody>';
               }else{
                 var col = 6
-                var p='<table id="share-report_tbl"><thead><tr><th>Sno</th><th>Company Name</th><th>No of Shares</th><th>Avg Price</th><th>Total</th><th>CMP</th><th>M-M Profit/Loss</th><th>Realized Profit</th></tr></thead><tbody>';
+                var p='<table id="share-report_tbl"><thead><tr><th>Sno</th><th>Company Name</th><th>No of Shares</th><th>Avg Price</th><th>Total</th><th>CMP</th><th>M-M Profit/Loss</th><th>Realise Profit</th></tr></thead><tbody>';
               }
               var total = 0;
               if(data.length){
@@ -51,9 +51,9 @@
                   portfolioName = data[x].pName;
                   if(data[x].quantity > 0){
                     if(data[x].contract){
-                    p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cName +'</td><td>'+ data[x].contract +'</td><td>'+ data[x].bstype +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td><td>'+data[x].rMark+'</td></tr>'
+                    p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cName +'</td><td>'+ data[x].contract +'</td><td>'+ data[x].bstype +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td><td>'+parseFloat(data[x].rMark).toFixed(2)+'</td></tr>'
                     }else{
-                    p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cName +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td><td>'+data[x].rMark+'</td></tr>'
+                    p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cName +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td><td>'+parseFloat(data[x].rMark).toFixed(2)+'</td></tr>'
                   }
                     total+= data[x].pl;
                   }
