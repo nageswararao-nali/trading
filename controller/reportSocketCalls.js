@@ -13,8 +13,10 @@ function reportSocketCalls(report,db,socket){
 		})
 	})
 	socket.on('getReports',function(data){
+		var segment = data.segment;
 		report.getReports(data,function(result){
-			socket.emit('getReports',result);
+			var response = {segment:segment,result:result}
+			socket.emit('getReports',response);
 		})
 	})
 	socket.on('getCmp',function(data){
