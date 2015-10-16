@@ -9,85 +9,7 @@
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="/assets/css/jquery-ui.css">
     <script src="/assets/js/jquery-ui.js"></script>
-    <script>
-      var socket = io.connect();
-      $(document).ready(function(){
-        // $("#share-report").hide();
-        socket.emit('getPortfolio','hi')
-        socket.on('getPortfolio',function(data){
-          console.log(data)
-          var p='<option value="">select</option>';
-          for(var x=0;x < data.length ;x++){
-            p+='<option value="'+ data[x].pName +'">'+data[x].pName+'</option>'
-          } 
-          $("#pName").html(p);    
-        })
-        socket.emit('ReportType','hi')
-        socket.on('ReportType',function(data){
-          var p='<option value="">select</option><option value="all">All</option>';
-          for(var x=0;x < data.length ;x++){
-            p+='<option value="'+ data[x].segment +'">'+data[x].segment+'</option>'
-          } 
-          $("#segment").html(p);    
-        })
-        $("#segment, #pName").off("change").on("change",function(){
-          var pName = $("#pName").val();
-          var segment = $("#segment").val();
-          $("#share-report").html(''); 
-          if(pName !== "" && segment !== ""){
-            if(segment === "all"){
-              socket.emit('getReports',{pName:pName,segment:"Equity",type:"current"})
-              setTimeout(function(){
-                socket.emit('getReports',{pName:pName,segment:"Futures",type:"current"})
-              },1000)
-
-            }else{
-              socket.emit('getReports',{pName:pName,segment:segment,type:"current"})
-              
-            }
-            socket.on('getReports',function(data){
-              console.log(data)
-              buildReportTable(data.result,data.segment,segment)
-            })
-          }
-          
-        })
-      })
-function buildReportTable(data,segment,type){
-  alert(segment + " ==> " + type)
-  if(segment === "Futures"){
-    var col = 8
-    var p='<h3>Futures</h3><table id="share-report_tbl"><thead><tr><th>Sno</th><th>Company Name</th><th>Contract Month</th><th>Buy / Sale</th><th>No of Shares</th><th>Avg Price</th><th>Total</th><th>CMP</th><th>M-M Profit/Loss</th><th>Realise Profit</th></tr></thead><tbody>';
-  }else if(segment === "Equity"){
-    var col = 6
-    var p='<h3>Equity</h3><table id="share-report_tbl"><thead><tr><th>Sno</th><th>Company Name</th><th>No of Shares</th><th>Avg Price</th><th>Total</th><th>CMP</th><th>M-M Profit/Loss</th><th>Realise Profit</th></tr></thead><tbody>';
-  }
-  var total = 0;
-  if(data.length){
-    var portfolioName,reportTypeName;
-    for(var x=0;x < data.length ;x++){
-      portfolioName = data[x].pName;
-      if(data[x].quantity > 0){
-        if(data[x].contract){
-        p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cName +'</td><td>'+ data[x].contract +'</td><td>'+ data[x].bstype +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td><td>'+parseFloat(data[x].rMark).toFixed(2)+'</td></tr>'
-        }else{
-        p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cName +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td><td>'+parseFloat(data[x].rMark).toFixed(2)+'</td></tr>'
-      }
-        total+= data[x].pl;
-      }
-    } 
-  }else{
-    p+='<tr><td colspan="8">No data found</td></tr>';
-  }
-  p+= "<tr><td colspan='"+col+"'>Total Profit</td><td colspan='2'>"+total+"</td></tr></tbody></table>";
-  // $("#share-report").show();
-  if(type === "all") {
-    $("#share-report").append(p); 
-  } else{
-    $("#share-report").html(p);  
-  };  
-}
-    </script>
+    
   </head>
   <body>
     <div class="header">
@@ -147,5 +69,94 @@ function buildReportTable(data,segment,type){
         </div>
       </div>
     </section>
+    <script>
+      var socket = io.connect();
+      var segment;
+      $(document).ready(function(){
+        // $("#share-report").hide();
+        socket.emit('getPortfolio','hi')
+        socket.on('getPortfolio',function(data){
+          console.log(data)
+          var p='<option value="">select</option>';
+          for(var x=0;x < data.length ;x++){
+            p+='<option value="'+ data[x].pName +'">'+data[x].pName+'</option>'
+          } 
+          $("#pName").html(p);    
+        })
+        socket.emit('ReportType','hi')
+        socket.on('ReportType',function(data){
+          var p='<option value="">select</option><option value="all">All</option>';
+          for(var x=0;x < data.length ;x++){
+            p+='<option value="'+ data[x].segment +'">'+data[x].segment+'</option>'
+          } 
+          $("#segment").html(p);    
+        })
+        socket.on('getReports',function(data){
+          console.log(data)
+          buildReportTable(data.result,data.segment,segment)
+        })
+        
+      })
+      $("#segment").on("change",function(evt){
+          getReportsFun()
+        })
+      $("#pName").on("change",function(evt){
+          getReportsFun()
+        })
+      function getReportsFun(){
+        // evt.stopPropagation();
+          alert("seg changed")
+          var pName = $("#pName").val();
+          segment = $("#segment").val();
+          $("#share-report").html(''); 
+          if(pName !== "" && segment !== ""){
+            if(segment === "all"){
+              socket.emit('getReports',{pName:pName,segment:"Equity",type:"current"})
+              setTimeout(function(){
+                socket.emit('getReports',{pName:pName,segment:"Futures",type:"current"})
+              },1000)
+
+            }else{
+              socket.emit('getReports',{pName:pName,segment:segment,type:"current"})
+              
+            }
+            
+          }
+      }
+function buildReportTable(data,segment,type){
+  alert(segment + " ==> " + type)
+  if(segment === "Futures"){
+    var col = 8
+    var p='<h3>Futures</h3><table id="share-report_tbl"><thead><tr><th>Sno</th><th>Company Name</th><th>Contract Month</th><th>Buy / Sale</th><th>No of Shares</th><th>Avg Price</th><th>Total</th><th>CMP</th><th>M-M Profit/Loss</th><th>Realise Profit</th></tr></thead><tbody>';
+  }else if(segment === "Equity"){
+    var col = 6
+    var p='<h3>Equity</h3><table id="share-report_tbl"><thead><tr><th>Sno</th><th>Company Name</th><th>No of Shares</th><th>Avg Price</th><th>Total</th><th>CMP</th><th>M-M Profit/Loss</th><th>Realise Profit</th></tr></thead><tbody>';
+  }
+  var total = 0;
+  if(data.length){
+    var portfolioName,reportTypeName;
+    for(var x=0;x < data.length ;x++){
+      portfolioName = data[x].pName;
+      if(data[x].quantity > 0){
+        if(data[x].contract){
+        p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cName +'</td><td>'+ data[x].contract +'</td><td>'+ data[x].bstype +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td><td>'+parseFloat(data[x].rMark).toFixed(2)+'</td></tr>'
+        }else{
+        p+='<tr><td>'+(x+1)+'</td><td>'+ data[x].cName +'</td><td>'+data[x].quantity+'</td><td>'+data[x].price+'</td><td>'+data[x].total+'</td><td>'+data[x].cmp+'</td><td>'+data[x].pl+'</td><td>'+parseFloat(data[x].rMark).toFixed(2)+'</td></tr>'
+      }
+        total+= data[x].pl;
+      }
+    } 
+  }else{
+    p+='<tr><td colspan="8">No data found</td></tr>';
+  }
+  p+= "<tr><td colspan='"+col+"'>Total Profit</td><td colspan='2'>"+total+"</td></tr></tbody></table>";
+  // $("#share-report").show();
+  if(type === "all") {
+    $("#share-report").append(p); 
+  } else{
+    $("#share-report").html(p);  
+  };  
+}
+    </script>
   </body>
 </html>
