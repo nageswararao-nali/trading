@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en"> 
   <head>
+  <meta http-equiv="expires" content="Mon, 26 Jul 1997 05:00:00 GMT"/>
+<meta http-equiv='cache-control' content='no-cache'>
+<meta http-equiv='expires' content='0'>
+<meta http-equiv='pragma' content='no-cache'>
+
+<meta http-equiv="pragma" content="no-cache" />
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>Quantum Leap</title>
@@ -11,7 +17,9 @@
     <script src="/assets/js/jquery-ui.js"></script>
     <script>
       var socket = io.connect();
+
       $(document).ready(function(){
+             // $.ajaxSetup({cache: false});
         // $("#share-report").hide();
         socket.emit('getPortfolio','hi')
         socket.on('getPortfolio',function(data){
@@ -30,7 +38,8 @@
           } 
           $("#segment").html(p);    
         })
-        $("#segment, #pName").off("change").on("change",function(){
+        $("#segment, #pName").on("change",function(){
+       // window.location.reload(true)
           var pName = $("#pName").val();
           var segment = $("#segment").val();
           $("#share-report").html(''); 
@@ -46,15 +55,28 @@
               
             }
             socket.on('getReports',function(data){
-              console.log(data)
+              console.log(data)           
+              
               buildReportTable(data.result,data.segment,segment)
             })
           }
           
         })
+function clearjQueryCache(){
+    for (var x in jQuery.cache){
+        delete jQuery.cache[x];
+    }
+}
+
+
+ 
+        //jQuery.removeData( "#segment, #pName","change");
+ //$("#segment, #pName").die("change")
+
       })
 function buildReportTable(data,segment,type){
   alert(segment + " ==> " + type)
+
   if(segment === "Futures"){
     var col = 8
     var p='<h3>Futures</h3><table id="share-report_tbl"><thead><tr><th>Sno</th><th>Company Name</th><th>Contract Month</th><th>Buy / Sale</th><th>No of Shares</th><th>Avg Price</th><th>Total</th><th>CMP</th><th>M-M Profit/Loss</th><th>Realise Profit</th></tr></thead><tbody>';
@@ -85,6 +107,7 @@ function buildReportTable(data,segment,type){
     $("#share-report").append(p); 
   } else{
     $("#share-report").html(p);  
+
   };  
 }
     </script>
