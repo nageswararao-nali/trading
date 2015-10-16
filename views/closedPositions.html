@@ -11,6 +11,7 @@
     <script src="/assets/js/jquery-ui.js"></script>
     <script>
       var socket = io.connect();
+      var segment;
       $(document).ready(function(){
         // $("#share-report").hide();
         socket.emit('getPortfolio','hi')
@@ -30,31 +31,46 @@
           } 
           $("#segment").html(p);    
         })
-         $("#segment, #pName").on("change",function(){
-          var pName = $("#pName").val();
-          var segment = $("#segment").val();
-          if(pName !== "" && segment !== ""){
-            socket.emit('getReports',{pName:pName,segment:segment,type:"closed"})
-            socket.on('getReports',function(data){
-              console.log(data)
-              if(segment === "Futures" || segment === "Equity"){
-                buildReportTable(segment,"")
-              } else{
-                buildReportTable("Futures","all")
-                buildReportTable("Equity","all")
-              }
-            })
-          }
-          
+        socket.on('getReports',function(data){
+          console.log(data)
+          buildReportTable(data.result,data.segment,segment)
         })
+        
       })
-function buildReportTable(segment,type){
+      $("#segment").on("change",function(evt){
+          getReportsFun()
+        })
+      $("#pName").on("change",function(evt){
+          getReportsFun()
+        })
+      function getReportsFun(){
+        // evt.stopPropagation();
+          alert("seg changed")
+          var pName = $("#pName").val();
+          segment = $("#segment").val();
+          $("#share-report").html(''); 
+          if(pName !== "" && segment !== ""){
+            if(segment === "all"){
+              socket.emit('getReports',{pName:pName,segment:"Equity",type:"closed"})
+              setTimeout(function(){
+                socket.emit('getReports',{pName:pName,segment:"Futures",type:"closed"})
+              },1000)
+
+            }else{
+              socket.emit('getReports',{pName:pName,segment:segment,type:"closed"})
+              
+            }
+            
+          }
+      }
+function buildReportTable(data,segment,type){
+  alert(segment + " ==> " + type)
   if(segment === "Futures"){
     var col = 8
-    var p='<table id="share-report_tbl"><thead><tr><th>Sno</th><th>Company Name</th><th>Contract Month</th><th>Buy / Sale</th><th>No of Shares</th><th>Avg Price</th><th>Total</th><th>CMP</th><th>M-M Profit/Loss</th><th>Realise Profit</th></tr></thead><tbody>';
+    var p='<h3>Futures</h3><table id="share-report_tbl"><thead><tr><th>Sno</th><th>Company Name</th><th>Contract Month</th><th>Buy / Sale</th><th>No of Shares</th><th>Avg Price</th><th>Total</th><th>CMP</th><th>M-M Profit/Loss</th><th>Realise Profit</th></tr></thead><tbody>';
   }else if(segment === "Equity"){
     var col = 6
-    var p='<table id="share-report_tbl"><thead><tr><th>Sno</th><th>Company Name</th><th>No of Shares</th><th>Avg Price</th><th>Total</th><th>CMP</th><th>M-M Profit/Loss</th><th>Realise Profit</th></tr></thead><tbody>';
+    var p='<h3>Equity</h3><table id="share-report_tbl"><thead><tr><th>Sno</th><th>Company Name</th><th>No of Shares</th><th>Avg Price</th><th>Total</th><th>CMP</th><th>M-M Profit/Loss</th><th>Realise Profit</th></tr></thead><tbody>';
   }
   var total = 0;
   if(data.length){
@@ -76,11 +92,9 @@ function buildReportTable(segment,type){
   p+= "<tr><td colspan='"+col+"'>Total Profit</td><td colspan='2'>"+total+"</td></tr></tbody></table>";
   // $("#share-report").show();
   if(type === "all") {
-    $("#share-report").append(p);  
-
+    $("#share-report").append(p); 
   } else{
     $("#share-report").html(p);  
-    
   };  
 }
     </script>
