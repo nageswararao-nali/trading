@@ -447,12 +447,11 @@ console.log('yesterday '+yesterday)
 // updateClosingBalance("Nicobar Capital",new Date(),function(closingBalance,msg){
 // 	console.log('status of updateClosingBalance is '+closingBalance+' message '+msg)
 // })
-runScript();
+/*runScript();
 setInterval(function(){
  runScript()
   
-},5 * 60 * 1000);
-// setNotification();
+},5 * 60 * 1000);*/
 function runScript(){
 	console.log(new Date().getHours() + " ======= " + new Date().getMinutes() )
 	// if(new Date().getHours() == 18 && new Date().getMinutes() <= 5){
@@ -550,4 +549,86 @@ function completePendingTransactions(callback){
 		}
 	})
 }
+readMFunds()
+function readMFunds(){
+	var date = new Date();
+	var fileUrl = "http://portal.amfiindia.com/spages/NAV0.txt";
+	var dPath = "assets/mutualfunds/mutualfunds_"+date.getDate()+"_"+date.getMonth()+".txt";
+	request.get({uri:fileUrl}).pipe(fs.createWriteStream(dPath))
+	setTimeout(function(){
+		parseTxtFile(dPath,function(finalObj){
+			// console.log(finalObj)
+		})
+	},2000)
+	
+}
+function parseTxtFile(dPath,callback){
+	var lineArray = fs.readFileSync(dPath).toString().split("\n");
+	for(i in lineArray) {
+	    //console.log("Line is --------------> " + array[i]);
+	}
+	var i=0,n=lineArray.length;
+	var finalObj = {},s=0,count=0,key,keyValArray=[];
+	var valueData = [
+			"SID",
+			"ISIN Div Payout/ ISIN Growth",
+			"ISIN Div Reinvestment",
+			"Scheme NAV Name",
+			"Net Asset Value",
+			"Repurchase Price",
+			"Sale Price",
+			"Date"
+		]
+	function lineLoop(i){
+		if(lineArray[i].trim() == ""){
+			if(s == 0){
+				key = keyValArray[0];
+				s=1;
+			}else{
+				console.log(key)
+				console.log("*****************************************************")
+				console.log(keyValArray)
+				finalObj[key] = keyValArray;
+				s=0;
+			}
+			keyValArray = [];
+			i++;
+			if(i >= n){
+				callback(finalObj)
+			}else{
+				setTimeout(function(){
+					lineLoop(i)
+				},0)
+			}
+		}else{
+			if(s == 1){
+				var lineData = lineArray[i].split(";");
+				var lineDataValues = {};
+				for(var j=0;j<lineData.length;j++){
+					lineDataValues[valueData[j]] = lineData[j];
+				}
+				keyValArray.push(lineDataValues)
+				i++;
+				if(i >= n){
+					callback(finalObj)
+				}else{
+					setTimeout(function(){
+						lineLoop(i)
+					},0)
+				}
+			}else{
+				keyValArray.push(lineArray[i])
+				i++;
+				if(i >= n){
+					callback(finalObj)
+				}else{
+					setTimeout(function(){
+						lineLoop(i)
+					},0)
+				}
+			}
+		}
+		
+	}lineLoop(i)
 
+}
